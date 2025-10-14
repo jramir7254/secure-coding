@@ -4,6 +4,7 @@ import { jwtDecode } from 'jwt-decode';
 import useAppNavigation from '@/hooks/use-nav'; // 👈 import your nav hook
 
 export type DecodedToken = {
+    id: string,
     teamName: string;
     accessCode: string;
     isAdmin: boolean;

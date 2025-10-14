@@ -14,7 +14,7 @@ export default function AuthPage() {
                 toGame(team.teamName);
             }
         }
-    }, [isLoggedIn]); // ✅ triggers whenever login state changes
+    }, []); // ✅ triggers whenever login state changes
 
     return (
         <section className="relative size-full p-6 text-white overflow-hidden">

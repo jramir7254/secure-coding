@@ -15,7 +15,7 @@ export default function App() {
     return (
         <QuestionProvider>
             <Header />
-            <main className='flex w-screen'>
+            <main className='flex w-screen '>
                 <Routes>
                     <Route path='/' element={<AuthPage />} />
                     <Route path='/:teamName' element={<GamePage />} />

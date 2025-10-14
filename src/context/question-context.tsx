@@ -16,7 +16,7 @@ type QuestionContext = {
 
 const blankQuestion = {
     output: '',
-    question: { code: '', answer: null, type: null, editable_ranges: [] },
+    question: { code: '', answer: null, type: null, editableRanges: [] },
     setOutput: () => { },
     input: '',
     setInput: () => { },
@@ -30,7 +30,7 @@ export type Answer = 'runtime' | 'logic' | 'compile' | 'vulnerability' | null;
 
 export type QuestionVariant = 'multiple' | 'coding' | null
 
-export type Question = { code: string, answer: Answer, type: QuestionVariant, editable_ranges: number[] }
+export type Question = { code: string, answer: Answer, type: QuestionVariant, editableRanges: number[] }
 
 
 
@@ -42,7 +42,7 @@ export const QuestionProvider = ({ children }: { children: React.ReactNode }) =>
         code: '',
         answer: null,
         type: null,
-        editable_ranges: []
+        editableRanges: []
     })
     const [input, setInput] = useState("")
 
@@ -50,7 +50,7 @@ export const QuestionProvider = ({ children }: { children: React.ReactNode }) =>
     useEffect(() => {
         const fetchQuestion = async () => {
             try {
-                const { data } = await BackendApi.get<Question>('/question');
+                const { data } = await BackendApi.get<Question>('/questions');
                 console.log('data', data);
                 setQuestion(data); // Set the fetched data to state
                 setInput(data.code)

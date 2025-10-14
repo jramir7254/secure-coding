@@ -42,11 +42,19 @@ export default function RegisterForm() {
     })
 
     const onSubmit = async (data: z.infer<typeof formSchema>) => {
-        const team = await register(data)
-        if (team) {
-            toGame(team?.teamName)
+        try {
+            const team = await register(data)
+            if (team) {
+                toGame(team?.teamName)
 
+            }
+        } catch (error) {
+            form.setError('root.serverError', {
+                type: 'manual',
+                message: error.message,
+            });
         }
+
     }
 
 
@@ -112,6 +120,9 @@ export default function RegisterForm() {
                     )}
                 />
             </FieldGroup>
+            {form.formState.errors.root?.serverError && (
+                <p className="text-destructive animate-shake">{form.formState.errors.root.serverError.message}</p>
+            )}
             <Button type="submit">Submit</Button>
 
         </form>

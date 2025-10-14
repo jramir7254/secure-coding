@@ -4,6 +4,7 @@ import { NavLink } from 'react-router'
 import RequireAdmin from './admin-guard'
 import useAuth from '@/hooks/use-auth'
 import { cn } from '@/lib/utils'
+import LogoutButton from '@/features/auth/components/logout-button'
 
 export default function Header() {
     const { team } = useAuth()
@@ -29,7 +30,7 @@ export default function Header() {
                     Home
                 </NavLink>
             </Button>
-
+            <LogoutButton />
         </header>
     )
 }
