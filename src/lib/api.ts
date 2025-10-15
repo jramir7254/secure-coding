@@ -1,5 +1,7 @@
 import axios from 'axios';
 import { tokenStore } from '@/features/auth/api/token-store';
+
+
 export const PistonApi = axios.create({
     baseURL: 'https://emkc.org/api/v2/piston'
 })
@@ -8,6 +10,12 @@ export const PistonApi = axios.create({
 export const BackendApi = axios.create({
     baseURL: 'http://localhost:3001'
 })
+
+export interface ApiError {
+    success: boolean;
+    message: string;
+    code: string;
+}
 
 
 BackendApi.interceptors.request.use(
@@ -20,6 +28,11 @@ BackendApi.interceptors.request.use(
         return config;
     },
     (error) => {
-        return Promise.reject(error);
+        const err: ApiError = error.response?.data || {
+            success: false,
+            message: "Unknown error",
+            code: "UNKNOWN",
+        }
+        return Promise.reject(err)
     }
 );

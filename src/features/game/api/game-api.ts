@@ -1,7 +1,7 @@
 import { BackendApi } from "@/lib/api";
 import { isAxiosError } from "axios";
 
-interface GameSchema {
+export interface GameSchema {
     id: string
     maxTeams: number
     isCurrent: boolean

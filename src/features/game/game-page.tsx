@@ -8,7 +8,6 @@ import RunButton from './components/coding/run-button';
 import OutputTerminal from './components/coding/output';
 import LogoutButton from '../auth/components/logout-button';
 import useAuth from '@/hooks/use-auth';
-import ResetButton from '../auth/components/reset-button';
 import { type QuestionVariant } from '@/context/question-context';
 import { useCurrentGame } from './hooks/use-game';
 import LobbyPage from './lobby-page';
@@ -27,7 +26,6 @@ export default function GamePage() {
                 <p>Team Id: {team?.id}</p>
                 <p>isAdmin: {isAdmin() ? 'Yes' : 'No'}</p>
                 <LogoutButton />
-                <ResetButton />
             </div>
             <div className='p-12 w-[45%]'>
                 {type === 'coding' ? <DebuggingView /> : <MultipleChoiceView setType={setType} />}
