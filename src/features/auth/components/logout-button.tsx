@@ -1,4 +1,5 @@
-import useAuth from "@/hooks/use-auth"
+// import useAuth from "@/hooks/use-auth"
+import { useAuth } from "../hooks/use-auth"
 import { Button } from "@/components/ui/button"
 import { LogOut } from "lucide-react"
 

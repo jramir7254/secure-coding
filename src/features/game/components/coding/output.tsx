@@ -1,11 +1,9 @@
 import React from 'react'
-import { useQuestionContext } from '@/context/question-context';
 
 
-export default function OutputTerminal() {
-    const { output } = useQuestionContext()
+export default function OutputTerminal({ hidden, output }: { hidden: boolean, output: string }) {
 
     return (
-        <div className='font-mono'>out: {output}</div>
+        <div hidden={hidden} className='font-nunit'>out: {output}</div>
     )
 }

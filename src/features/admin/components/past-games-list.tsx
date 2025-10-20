@@ -1,14 +1,14 @@
 import React from 'react'
 import { usePastGames, useCurrentGame } from '../../game/hooks/use-game'
 import { DevCard } from '@/components/dev-blocks'
-import type { GameSchema } from '@/features/game/api/game-api'
+import { type GameSchema } from '../hooks/use-admin'
 
 export default function PastGamesList() {
     const { data: pastGames, isLoading } = usePastGames()
 
     return (
-        <div className='flex-col'>
-            {isLoading ? '...loading' : (pastGames && pastGames.length ? GameCards(pastGames) : <p>No past games to show</p>)}
+        <div className='flex flex-col items-center  size-full '>
+            {isLoading ? '...loading' : (pastGames && pastGames.length ? GameCards(pastGames) : <p className='text-muted-foreground mt-10 italic'>No past games to show</p>)}
         </div>
     )
 }
@@ -16,9 +16,9 @@ export default function PastGamesList() {
 
 function GameCards(pastGames: GameSchema[]) {
     return pastGames.map(g => (
-        <DevCard>
-            <p>{g.id}</p>
-            <p>{g.endedAt}</p>
+        <DevCard key={`${g.id}-past`}>
+            <p>Game #{g.id}</p>
+            <p>{new Date(g?.endedAt).toLocaleTimeString()}</p>
         </DevCard>
     ))
 }

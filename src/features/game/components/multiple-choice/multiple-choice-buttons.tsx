@@ -1,11 +1,15 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { motion } from "motion/react"
-import { useQuestionContext, type QuestionVariant } from '@/context/question-context';
 import { shuffleArrayEveryNewSpot } from "@/lib/utils";
+import type { Question } from "../../hooks/use-question";
+import { type AnswerChoices, useMultipleChoiceAttempt } from "../../hooks/use-question";
 const MotionButton = motion.create(Button)
 
-const options = [
+
+type ButtonProps = { value: AnswerChoices, label: string }
+
+const options: ButtonProps[] = [
     { value: "compile", label: "Compile Time Error" },
     { value: "runtime", label: "Runtime Error" },
     { value: "logic", label: "Logic Error" },
@@ -13,35 +17,32 @@ const options = [
 ]
 
 
-export function QuizButtons({ setType }: { setType: React.Dispatch<React.SetStateAction<QuestionVariant>> }) {
+export function QuizButtons({ hidden, question, attemptId }: { hidden: boolean, question: Question, attemptId: number }) {
+    const submitAttempt = useMultipleChoiceAttempt({ questionId: question.id, attemptId, questionType: 'multiple' })
     const [order, setOrder] = useState(options)
-    const [selected, setSelected] = useState("")
+    const [selected, setSelected] = useState<AnswerChoices>(null)
     const [isIncorrect, setIsIncorrect] = useState(false)
-    const { question, setReadOnly } = useQuestionContext()
 
 
 
 
-    const handleSubmit = () => {
-        if (selected === "") return // nothing chosen
-        if (selected !== question.answer) {
-            // wrong — trigger shake + red
+    const handleSubmit = async () => {
+        if (selected === null) return // nothing chosen
+        try {
+            await submitAttempt.mutateAsync(selected)
+            console.log("✅ Correct!")
+        } catch (error) {
             setIsIncorrect(true)
             setTimeout(() => {
                 setIsIncorrect(false)
-                setSelected("")
+                setSelected(null)
                 setOrder(shuffleArrayEveryNewSpot(order))
             }, 600)
-        } else {
-            // correct — you can trigger a success animation later
-            console.log("✅ Correct!")
-            setReadOnly(false)
-            setType('coding')
         }
     }
 
     return (
-        <div className="flex flex-col gap-2">
+        <div hidden={hidden} className="flex flex-col gap-2">
             {order.map((opt) => (
                 <MotionButton layout
                     key={opt.value}

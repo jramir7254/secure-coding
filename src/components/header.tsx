@@ -2,35 +2,51 @@ import React from 'react'
 import { Button, buttonVariants } from './ui/button'
 import { NavLink } from 'react-router'
 import RequireAdmin from './admin-guard'
-import useAuth from '@/hooks/use-auth'
 import { cn } from '@/lib/utils'
 import LogoutButton from '@/features/auth/components/logout-button'
+import { RequireTeam } from './admin-guard'
+import ResetButton from '@/features/admin/components/reset-button'
+import { useTeam } from '@/features/auth/hooks/use-team'
+
+
 
 export default function Header() {
-    const { team } = useAuth()
-    return (
-        <header className='h-16 bg-accent border-b-2'>
-            <RequireAdmin>
-                <Button asChild variant="link">
-                    <NavLink
-                        to="/admin"
-                        className={({ isActive }) =>
-                            isActive ? "underline" : undefined
-                        }
-                    >
-                        Admin
-                    </NavLink>
-                </Button>
-            </RequireAdmin>
+    const { data: team, isLoading, error } = useTeam();
 
-            <Button asChild variant="link">
-                <NavLink to={`/${team?.teamName}`} className={({ isActive }) =>
-                    isActive ? "text-primary font-semibold" : "text-muted-foreground" // Example active styling
-                }>
-                    Home
-                </NavLink>
-            </Button>
-            <LogoutButton />
+    return (
+        <header className='h-20 bg-accent border-b-2 flex justify-between items-center px-16 z-1'>
+
+            <div className='flex items-center gap-5 cursor-pointer'>
+                <div className='h-10 w-10 overflow-hidden flex items-center justify-center'>
+                    <img src='/htb.png' className='object-cover' />
+                </div>
+                <h3 className='font-bebas text-4xl tracking-wider'>Secure Coding</h3>
+            </div>
+
+            <nav className='flex items-center gap-5' >
+                <RequireAdmin>
+                    <Button asChild variant="link">
+                        <NavLink
+                            to="/admin/manage"
+                            className={({ isActive }) =>
+                                isActive ? "underline" : undefined
+                            }
+                        >
+                            Admin
+                        </NavLink>
+                    </Button>
+                </RequireAdmin>
+
+
+                <RequireTeam>
+                    <LogoutButton />
+                </RequireTeam>
+                <RequireAdmin>
+                    <ResetButton />
+                </RequireAdmin>
+            </nav>
+
+
         </header>
     )
 }

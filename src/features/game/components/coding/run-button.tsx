@@ -1,37 +1,32 @@
 import { Button } from '@/components/ui/button'
-import React, { useState } from 'react'
-import { useQuestionContext } from '@/context/question-context';
+import React, { useState, type SetStateAction } from 'react'
 import { Play } from 'lucide-react';
 import { PistonApi } from '@/lib/api';
+import { useCodingAttempt, type Question } from '../../hooks/use-question';
 
 
-export default function RunButton() {
-    const { setOutput, input } = useQuestionContext()
+export default function RunButton({ hidden, question, attemptId, input, setOutput }: {
+    hidden: boolean,
+    question: Question,
+    attemptId: number,
+    input: string,
+    setOutput: React.Dispatch<SetStateAction<string>>
+}) {
+    const submitAttempt = useCodingAttempt({ questionId: question.id, attemptId, questionType: 'coding' })
+
     const [loading, setIsLoading] = useState(false)
-    console.log(input)
 
     async function run() {
         try {
             setIsLoading(true)
-            const { data } = await PistonApi.post('/execute', {
-                "language": "java",
-                "version": "15.0.2",
-                "files": [
-                    {
-                        "name": "Main.java",
-                        "content": input
-                    }
-                ],
-                "stdin": "",
-                "args": []
-            })
+            console.log("input", input)
+            const { output } = await submitAttempt.mutateAsync(input)
+            console.log("d", output)
+            setOutput(output)
 
-            const { run } = data
-
-            console.log({ o: run.stdout })
-            console.log({ o: run.stderr })
-            setOutput(run.stdout || run.stderr)
         } catch (error) {
+            console.debug('err', error)
+            setOutput(error.message)
 
         } finally {
             setIsLoading(false)
@@ -41,6 +36,6 @@ export default function RunButton() {
     }
 
     return (
-        <Button onClick={run} disabled={loading}>Run<Play /></Button>
+        <Button hidden={hidden} onClick={run} disabled={loading}>Run<Play /></Button>
     )
 }

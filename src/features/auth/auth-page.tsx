@@ -1,15 +1,16 @@
 import { useEffect } from 'react';
-import AuthForm from '@/features/auth/components/auth-form';
-import useAuth from '@/hooks/use-auth';
+import { useTeam } from './hooks/use-team';
+import AuthForm from './components/auth-form';
 import useAppNavigation from '@/hooks/use-nav';
+import LetterGlitch from '@/components/letter-glitch';
 
 export default function AuthPage() {
-    const { isLoggedIn, getTeam } = useAuth();
+    const { data: team, isLoading, error } = useTeam();
     const { toGame } = useAppNavigation();
 
     useEffect(() => {
-        if (isLoggedIn) {
-            const team = getTeam();
+        if (!isLoading && team) {
+
             if (team) {
                 toGame(team.teamName);
             }
@@ -17,9 +18,18 @@ export default function AuthPage() {
     }, []); // ✅ triggers whenever login state changes
 
     return (
-        <section className="relative size-full p-6 text-white overflow-hidden">
-            <div className="relative z-10 size-full">
+        <section className="flex-1 relative grid grid-cols-2   text-white overflow-hidden">
+            <div className="col-span-1 z-1 h-full p-10">
                 <AuthForm />
+            </div>
+
+            <div className='absolute top-0 flex-1 size-full'>
+                <LetterGlitch
+                    className=''
+                    glitchSpeed={100}
+                    centerVignette={false}
+                    outerVignette={false}
+                    smooth={true} />
             </div>
         </section>
     );
