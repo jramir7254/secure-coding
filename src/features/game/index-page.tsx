@@ -3,8 +3,8 @@ import React, { useEffect } from 'react';
 import { useCurrentGame } from './hooks/use-game';
 import { Navigate, Outlet, useLocation, useNavigate } from 'react-router';
 import { useTeam } from '../auth/hooks/use-team';
-import { useSocket } from '@/hooks/use-socket';
 
+import { useSocket } from '@/hooks/use-socket';
 export default function IndexPage() {
     const { data: currentGame, isLoading } = useCurrentGame();
     const { data: team } = useTeam();

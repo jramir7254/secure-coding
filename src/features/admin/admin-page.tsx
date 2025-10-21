@@ -3,12 +3,12 @@ import CreateGameForm from './components/create-game-form'
 import { usePastGames, useCurrentGame } from '../game/hooks/use-game'
 import PastGamesList from './components/past-games-list'
 import { Button } from '@/components/ui/button'
-import { DevBlock } from '@/components/dev-blocks'
+import { DevBlock, Block } from '@/components/blocks'
 import ResetButton from './components/reset-button'
-import { DevCard } from '@/components/dev-blocks'
+import { DevCard } from '@/components/blocks'
 import { socket } from '@/lib/socket'
 import { Separator } from '@/components/ui/separator'
-import { useCurrentGameTeams } from './hooks/use-admin'
+import { useCurrentGameTeams, useCloseGame } from './hooks/use-admin'
 import TeamCard from './components/team-card'
 import { ScrollArea } from "@/components/ui/scroll-area"
 import CountdownTimer from '@/components/blocks/timer'
@@ -18,6 +18,7 @@ import CountdownNum from '@/components/blocks/countdown-num'
 export default function AdminPage() {
     const { data: currentGame } = useCurrentGame()
     const { data: currentTeams } = useCurrentGameTeams()
+    const closeGame = useCloseGame()
 
 
     const didGameStart = currentGame?.startedAt !== null
@@ -33,7 +34,7 @@ export default function AdminPage() {
 
     return (
         <section className='flex-1 grid grid-cols-2 gap-5 m-5'>
-            <DevBlock className='p-8 flex flex-col gap-3'>
+            <Block className='p-8 flex flex-col gap-3'>
                 <div className=''>
                     {currentGame ?
                         <DevCard className='p-5 relative'>
@@ -53,7 +54,7 @@ export default function AdminPage() {
                                 </div>
                             </div>
                             <div className='ml-auto flex gap-4' hidden={currentGame.endedAt === null}>
-                                <Button variant='outline' disabled>Game Finished</Button>
+                                <Button onClick={() => closeGame.mutateAsync()}>New Game</Button>
                             </div>
                         </DevCard>
                         :
@@ -70,13 +71,13 @@ export default function AdminPage() {
                         {currentTeams && currentTeams.map(t => <TeamCard key={`${t.teamName}-${t.id}`} team={t} />)}
                     </ScrollArea>
                 </div>
-            </DevBlock>
+            </Block>
 
 
-            <DevBlock className='p-8'>
+            <Block className='p-8'>
                 <h2 className='font-nunit font-bold text-2xl'>Past Games</h2>
                 <PastGamesList />
-            </DevBlock>
+            </Block>
         </section>
     )
 }

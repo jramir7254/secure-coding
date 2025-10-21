@@ -1,6 +1,6 @@
 import React from 'react'
 import { usePastGames, useCurrentGame } from '../../game/hooks/use-game'
-import { DevCard } from '@/components/dev-blocks'
+import { DevCard } from '@/components/blocks'
 import { type GameSchema } from '../hooks/use-admin'
 
 export default function PastGamesList() {
@@ -16,7 +16,7 @@ export default function PastGamesList() {
 
 function GameCards(pastGames: GameSchema[]) {
     return pastGames.map(g => (
-        <DevCard key={`${g.id}-past`}>
+        <DevCard key={`${g.id}-past`} className='w-full'>
             <p>Game #{g.id}</p>
             <p>{new Date(g?.endedAt).toLocaleTimeString()}</p>
         </DevCard>

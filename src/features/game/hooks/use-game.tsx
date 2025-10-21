@@ -1,27 +1,68 @@
 import React, { useEffect } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { socket } from '@/lib/socket';
+// import { socket } from '@/lib/socket';
 import { useApi } from '@/hooks/use-api';
 import { logger } from '@/lib/logger';
-import { type GameSchema } from '@/features/admin/hooks/use-admin';
+import { useSocket } from '@/hooks/use-socket';
+
+export interface GameSchema {
+    id: string
+    maxTeams: number
+    isCurrent: boolean
+    timeLimit: number
+    startedAt: number | string | null
+    endedAt: number | null
+}
+
+
+
 export const gameKeys = {
     all: ['games'] as const,
-    current: ["games", "current"] as const,
-    previous: ["games", "previous"] as const,
-    leaderboard: ["games", "leaderboard"] as const,
+    one: (gameId: number) => [...gameKeys.all, "one", gameId] as const,
+    current: () => [...gameKeys.all, "current"] as const,
+    previous: () => [...gameKeys.all, "previous"] as const,
+    leaderboard: () => [...gameKeys.all, "leaderboard"] as const,
+
 };
 
 
 export function useCurrentGame() {
-    const queryClient = useQueryClient()
+    const socket = useSocket()
     const { call } = useApi('games')
+    const queryClient = useQueryClient()
+
+    useEffect(() => {
+        if (!socket) return; // 👈 guard in case socket isn’t ready yet
+
+        socket.on('game_started', () => {
+            logger.info('[Socket]: "game_started"')
+            queryClient.invalidateQueries({ queryKey: gameKeys.current() });
+        });
+
+        return () => { socket.off('game_started') };
+    }, []);
+
+    return useQuery({
+        queryKey: gameKeys.current(),
+        queryFn: () => call<GameSchema | null>('get', '/current'),
+    })
+}
+
+
+export function useGame() {
+    const socket = useSocket()
+
+    const { call } = useApi('games')
+    const queryClient = useQueryClient()
 
 
     useEffect(() => {
+        if (!socket) return; // 👈 guard in case socket isn’t ready yet
+
         // Listen for incoming messages
         socket.on('game_started', (data) => {
             console.log('here2')
-            queryClient.invalidateQueries({ queryKey: gameKeys.current });
+            queryClient.invalidateQueries({ queryKey: gameKeys.current() });
         });
 
         // Cleanup listener on unmount
@@ -31,7 +72,7 @@ export function useCurrentGame() {
     }, []);
 
     return useQuery({
-        queryKey: gameKeys.current,
+        queryKey: gameKeys.current(),
         queryFn: () => call<GameSchema | null>('get', '/current'),
     })
 }
@@ -41,32 +82,36 @@ export function usePastGames() {
     const { call } = useApi('games')
 
     return useQuery({
-        queryKey: gameKeys.previous,
+        queryKey: gameKeys.previous(),
         queryFn: () => call<GameSchema[]>('get', '/past'),
     })
 }
 
-export function useGameLeaderboard() {
-    const { call } = useApi('games')
 
+
+/**
+ * 
+ * @returns 
+ */
+export function useGameLeaderboard() {
+    const socket = useSocket()
+
+    const { call } = useApi('games')
     const queryClient = useQueryClient()
 
     useEffect(() => {
-        // Listen for incoming messages
+        if (!socket) return; // 👈 guard in case socket isn’t ready yet
+
         socket.on('leaderboard_updated', (data) => {
-            logger.debug('leaderboard update')
-            queryClient.invalidateQueries({ queryKey: gameKeys.leaderboard });
+            logger.info('[Socket]: "leaderboard_updated"')
+            queryClient.invalidateQueries({ queryKey: gameKeys.leaderboard() });
         });
 
-        // Cleanup listener on unmount
-        return () => {
-            socket.off('leaderboard_updated');
-        };
+        return () => { socket.off('leaderboard_updated') };
     }, []);
 
     return useQuery({
-        queryKey: gameKeys.leaderboard,
+        queryKey: gameKeys.leaderboard(),
         queryFn: () => call('get', '/leaderboard'),
-
     })
 }

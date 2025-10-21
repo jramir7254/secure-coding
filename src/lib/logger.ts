@@ -182,6 +182,7 @@ const methods = {
         methods.groupEnd();
         clearCorrelationId();
     },
+
 } satisfies Omit<Logger, 'create'>;
 
 // Namespace support

@@ -36,6 +36,7 @@ export class ErrorBoundary extends React.Component<
                 <div className="p-4 text-red-500">
                     <h2>Something went wrong.</h2>
                     <pre>{this.state.error?.message}</pre>
+                    <pre>{this.state.error?.stack}</pre>
                 </div>
             )
         }

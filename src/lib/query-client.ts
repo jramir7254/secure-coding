@@ -18,8 +18,10 @@ export const queryClient = new QueryClient({
             // suspense: false,           // Optional: disable suspense if you prefer manual handling
         },
         mutations: {
+
             retry: 0, // Don’t retry failed actions — surface the error immediately
             onError: (err) => console.error('Mutation failed:', err),
         },
+
     },
 })

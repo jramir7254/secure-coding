@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { DevBlock } from '@/components/dev-blocks'
+import { DevBlock } from '@/components/blocks'
 import useAppNavigation from '@/hooks/use-nav'
 import { useTeam } from '@/features/auth/hooks/use-team'
 import CountdownNum from '@/components/blocks/countdown-num'
