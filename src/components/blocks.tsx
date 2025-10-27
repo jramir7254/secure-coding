@@ -26,6 +26,15 @@ export function Block({ children, className }: BlockProps) {
     )
 }
 
+
+export function Section({ children, className }: BlockProps) {
+    return (
+        <section className={className}>
+            {children}
+        </section>
+    )
+}
+
 export function Flex({ children, className, direction = 'col', centered, ...props }: BlockProps) {
     return (
         <div className={`flex flex-${direction} ${centered ? 'items-center justify-center' : ''} ${className}`} {...props}>

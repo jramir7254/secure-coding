@@ -12,6 +12,7 @@ body,
 
 main {
     flex: 1;
+
 }
 
 .monaco-editor .editable-singleline-highlight {

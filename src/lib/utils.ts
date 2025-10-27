@@ -40,3 +40,17 @@ export function shuffleArrayEveryNewSpot<T>(array: Array<T>) {
 
     return tempArray;
 }
+
+
+export function msToMinutes(ms: number) {
+    return ms / 60 / 1_000
+}
+
+
+export function formatDate(date: string) {
+    return new Intl.DateTimeFormat("en-US", {
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true, // Use 12-hour format with AM/PM
+    }).format(new Date(date));
+}

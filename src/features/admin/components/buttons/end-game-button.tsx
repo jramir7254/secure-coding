@@ -17,19 +17,21 @@ export function EndGameButton() {
 
     return (
         <AlertDialog>
+
             <AlertDialogTrigger asChild>
-                <Button
-                    className="hover:!bg-destructive hover:!text-destructive-foreground hover:!border-transparent"
-                >
+                <Button className="hover:!bg-destructive hover:!text-destructive-foreground hover:!border-transparent">
                     End Game
                 </Button>
             </AlertDialogTrigger>
+
             <AlertDialogContent>
                 <AlertDialogHeader>
                     <AlertDialogTitle>Are you sure you want to end the game?</AlertDialogTitle>
                 </AlertDialogHeader>
+
                 <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
+
                     <AlertDialogAction asChild>
                         <Button variant='destructive' onClick={() => endGame.mutate()}>
                             Confirm
@@ -37,6 +39,7 @@ export function EndGameButton() {
                     </AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>
+
         </AlertDialog>
     )
 }

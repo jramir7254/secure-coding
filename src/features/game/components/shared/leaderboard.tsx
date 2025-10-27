@@ -1,29 +1,23 @@
-import React from 'react'
-import { useGameLeaderboard } from '../../hooks/use-game'
-import TeamCard from '@/features/admin/components/team-card'
+import { useCurrentGameLeaderboard } from '../../hooks/use-game'
+import TeamCard from '@/components/blocks/team-card'
 import { motion, AnimatePresence } from "motion/react"
-const MotionCard = motion.create(TeamCard)
 
 
 export default function LeaderBoard() {
-    const { data: leaderboard } = useGameLeaderboard()
+    const { data: leaderboard } = useCurrentGameLeaderboard()
 
     return (
-
-        <motion.div layout className='space-y-3'>
-            {leaderboard && leaderboard.map(
-                (i, place) =>
-                    <MotionCard
-                        layout
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 10 }}
-                        transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                        key={`${i?.teamName}-${i?.id}`}
-                        team={i}
-                        place={place}
-                    />
-            )}
+        <motion.div layout className="space-y-3">
+            {leaderboard?.sort((a, b) => b.points - a.points).map((i, place) => (
+                <motion.div key={`leaderboard-${i.teamId}`} layout transition={{ duration: 0.4, ease: "easeInOut" }}>
+                    <TeamCard
+                        team={{ id: i.teamId, points: i.points, teamName: i.teamName }}
+                    >
+                        <p>{i.points}</p>
+                    </TeamCard>
+                </motion.div>
+            ))}
         </motion.div>
     )
 }
+

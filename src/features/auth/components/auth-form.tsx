@@ -3,13 +3,13 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 
+import { Input, Button, Switch } from "@/components/ui/";
 import { Field, FieldLabel, FieldError } from "@/components/ui/field";
 import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from "@/components/ui/input-otp";
-import { Input, Button, Switch } from "@/components/ui/";
 
-import useAppNavigation from "@/hooks/use-nav";
 import { toast } from "sonner";
 import { useAuth } from "../hooks/use-auth";
+import useAppNavigation from "@/hooks/use-nav";
 
 
 
@@ -141,7 +141,7 @@ export default function AuthForm() {
             {/* Toggle Switch */}
             <div className="flex items-center justify-center gap-3">
                 <span className="text-sm font-medium">Register</span>
-                <Switch
+                <Switch className="!bg-purple-700"
                     checked={isLogin}
                     onCheckedChange={(checked) => setIsLogin(checked)}
                 />

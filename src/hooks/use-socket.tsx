@@ -1,7 +1,7 @@
 // src/hooks/useSocket.ts
 import { socket } from "../lib/socket";
 
-import React, { createContext, useContext, useEffect, useRef } from "react";
+import React, { createContext, useContext, useEffect } from "react";
 import { logger } from "@/lib/logger";
 import type { Socket } from "socket.io-client";
 
@@ -10,12 +10,12 @@ const SocketContext = createContext<Socket>(socket);
 export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
 
     useEffect(() => {
-        socket.connect(); // 👈 explicitly connect
+        socket.connect();
 
-        console.log("[Socket] Connected");
+        logger.info("[Socket] connected");
         return () => {
             socket.disconnect();
-            console.log("[Socket] Disconnected");
+            logger.info("[Socket] disconnected");
         };
     }, []);
 
@@ -33,16 +33,3 @@ export function useSocket() {
     return socket;
 }
 
-
-// export function useSocket() {
-//     const socketRef = useRef<Socket>(undefined);
-
-//     useEffect(() => {
-//         const socket = io(import.meta.env.VITE_API_URL || "http://localhost:3001");
-//         socketRef.current = socket;
-
-//         return () => { socket.disconnect() };
-//     }, []);
-
-//     return socketRef.current;
-// }

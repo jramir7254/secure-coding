@@ -2,6 +2,7 @@ import { useRef, useEffect } from 'react';
 
 const LetterGlitch = ({
     glitchColors = ['#120026', '#a84ef7', '#b463c7'],
+
     glitchSpeed = 50,
     centerVignette = false,
     outerVignette = true,
@@ -14,31 +15,43 @@ const LetterGlitch = ({
     centerVignette?: boolean;
     outerVignette?: boolean;
     smooth?: boolean;
-    className?: string;
+    className?: string
     characters?: string;
 }) => {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const animationRef = useRef<number | null>(null);
     const letters = useRef<
-        { char: string; color: string; targetColor: string; colorProgress: number }[]
+        {
+            char: string;
+            color: string;
+            targetColor: string;
+            colorProgress: number;
+        }[]
     >([]);
     const grid = useRef({ columns: 0, rows: 0 });
     const context = useRef<CanvasRenderingContext2D | null>(null);
     const lastGlitchTime = useRef(Date.now());
 
     const lettersAndSymbols = Array.from(characters);
+
     const fontSize = 16;
     const charWidth = 10;
     const charHeight = 20;
 
-    const getRandomChar = () =>
-        lettersAndSymbols[Math.floor(Math.random() * lettersAndSymbols.length)];
-    const getRandomColor = () =>
-        glitchColors[Math.floor(Math.random() * glitchColors.length)];
+    const getRandomChar = () => {
+        return lettersAndSymbols[Math.floor(Math.random() * lettersAndSymbols.length)];
+    };
+
+    const getRandomColor = () => {
+        return glitchColors[Math.floor(Math.random() * glitchColors.length)];
+    };
 
     const hexToRgb = (hex: string) => {
         const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
-        hex = hex.replace(shorthandRegex, (_m, r, g, b) => r + r + g + g + b + b);
+        hex = hex.replace(shorthandRegex, (_m, r, g, b) => {
+            return r + r + g + g + b + b;
+        });
+
         const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
         return result
             ? {
@@ -90,15 +103,13 @@ const LetterGlitch = ({
 
         canvas.width = rect.width * dpr;
         canvas.height = rect.height * dpr;
+
         canvas.style.width = `${rect.width}px`;
         canvas.style.height = `${rect.height}px`;
 
-        const ctx = canvas.getContext('2d');
-        if (!ctx) return;
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        ctx.font = `${fontSize}px monospace`;
-        ctx.textBaseline = 'top';
-        context.current = ctx;
+        if (context.current) {
+            context.current.setTransform(dpr, 0, 0, dpr, 0, 0);
+        }
 
         const { columns, rows } = calculateGrid(rect.width, rect.height);
         initializeLetters(columns, rows);
@@ -106,18 +117,12 @@ const LetterGlitch = ({
     };
 
     const drawLetters = () => {
+        if (!context.current || letters.current.length === 0) return;
         const ctx = context.current;
-        const canvas = canvasRef.current;
-        if (!ctx || !canvas) return;
-
-        const { width, height } = canvas.getBoundingClientRect();
-
-        // 🔮 Motion blur layer
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
-        ctx.fillRect(0, 0, width, height);
-
-        // 🎛️ Idle flicker alpha
-        ctx.globalAlpha = 0.98 + Math.random() * 0.02;
+        const { width, height } = canvasRef.current!.getBoundingClientRect();
+        ctx.clearRect(0, 0, width, height);
+        ctx.font = `${fontSize}px monospace`;
+        ctx.textBaseline = 'top';
 
         letters.current.forEach((letter, index) => {
             const x = (index % grid.current.columns) * charWidth;
@@ -125,33 +130,34 @@ const LetterGlitch = ({
             ctx.fillStyle = letter.color;
             ctx.fillText(letter.char, x, y);
         });
-
-        ctx.globalAlpha = 1;
     };
 
     const updateLetters = (fraction: number = 0.05) => {
-        if (!letters.current.length) return;
+        if (!letters.current || letters.current.length === 0) return;
+
         const updateCount = Math.max(1, Math.floor(letters.current.length * fraction));
+
         for (let i = 0; i < updateCount; i++) {
             const index = Math.floor(Math.random() * letters.current.length);
-            const letter = letters.current[index];
-            if (!letter) continue;
-            letter.char = getRandomChar();
-            letter.targetColor = getRandomColor();
+            if (!letters.current[index]) continue;
+
+            letters.current[index].char = getRandomChar();
+            letters.current[index].targetColor = getRandomColor();
+
             if (!smooth) {
-                letter.color = letter.targetColor;
-                letter.colorProgress = 1;
+                letters.current[index].color = letters.current[index].targetColor;
+                letters.current[index].colorProgress = 1;
             } else {
-                letter.colorProgress = 0;
+                letters.current[index].colorProgress = 0;
             }
         }
     };
 
     const handleSmoothTransitions = () => {
         let needsRedraw = false;
-        letters.current.forEach((letter) => {
+        letters.current.forEach(letter => {
             if (letter.colorProgress < 1) {
-                letter.colorProgress += 0.04; // smoother fade speed
+                letter.colorProgress += 0.04;
                 if (letter.colorProgress > 1) letter.colorProgress = 1;
 
                 const startRgb = hexToRgb(letter.color);
@@ -162,7 +168,10 @@ const LetterGlitch = ({
                 }
             }
         });
-        if (needsRedraw) drawLetters();
+
+        if (needsRedraw) {
+            drawLetters();
+        }
     };
 
     const animate = () => {
@@ -172,7 +181,7 @@ const LetterGlitch = ({
         // Adaptive micro-updates for long glitch intervals
         const interval = glitchSpeed > 300 ? 150 : glitchSpeed;
         if (elapsed >= interval) {
-            const fraction = glitchSpeed > 300 ? 0.01 : 0.05; // smaller updates when speed is slow
+            const fraction = glitchSpeed > 300 ? 0.005 : 0.05; // smaller updates when speed is slow
             updateLetters(fraction);
             drawLetters();
             lastGlitchTime.current = now;
@@ -183,16 +192,26 @@ const LetterGlitch = ({
     };
 
     useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        context.current = canvas.getContext('2d');
         resizeCanvas();
         animate();
 
+        let resizeTimeout: NodeJS.Timeout;
+
         const handleResize = () => {
-            cancelAnimationFrame(animationRef.current as number);
-            resizeCanvas();
-            animate();
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                cancelAnimationFrame(animationRef.current as number);
+                resizeCanvas();
+                animate();
+            }, 100);
         };
 
         window.addEventListener('resize', handleResize);
+
         return () => {
             cancelAnimationFrame(animationRef.current!);
             window.removeEventListener('resize', handleResize);
@@ -201,27 +220,13 @@ const LetterGlitch = ({
     }, [glitchSpeed, smooth]);
 
     return (
-        <div className={`${className || ''} relative w-full h-full bg-black overflow-hidden`}>
-            {/* Canvas Layer */}
+        <div className={`${className} relative w-full h-full bg-black overflow-hidden`}>
             <canvas ref={canvasRef} className="block w-full h-full" />
-
-            {/* 💜 Animated glow gradient */}
-            <div
-                aria-hidden
-                className="absolute inset-0 pointer-events-none"
-                style={{
-                    background: `linear-gradient(120deg, #a855f733, #22d3ee33, #a855f733)`,
-                    backgroundSize: '400% 400%',
-                    animation: 'gradientShift 8s ease infinite',
-                }}
-            />
-
-            {/* Optional Vignettes */}
             {outerVignette && (
-                <div className="absolute top-0 left-0 w-full h-full pointer-events-none bg-[radial-gradient(circle,rgba(0,0,0,0)_60%,rgba(0,0,0,1)_100%)]"></div>
+                <div className="absolute top-0 left-0 w-full h-full pointer-events-none bg-[radial-gradient(circle,_rgba(0,0,0,0)_60%,_rgba(0,0,0,1)_100%)]"></div>
             )}
             {centerVignette && (
-                <div className="absolute top-0 left-0 w-full h-full pointer-events-none bg-[radial-gradient(circle,rgba(0,0,0,0.8)_0%,rgba(0,0,0,0)_60%)]"></div>
+                <div className="absolute top-0 left-0 w-full h-full pointer-events-none bg-[radial-gradient(circle,_rgba(0,0,0,0.8)_0%,_rgba(0,0,0,0)_60%)]"></div>
             )}
         </div>
     );

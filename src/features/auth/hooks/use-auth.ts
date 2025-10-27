@@ -1,14 +1,15 @@
-import { useQuery, useMutation, useQueryClient, QueryClient } from "@tanstack/react-query";
-import { useApi } from "@/hooks/use-api";
+import { useQueryClient } from "@tanstack/react-query";
 import { jwtDecode } from "jwt-decode";
 import useAppNavigation from "@/hooks/use-nav";
 import { create } from 'zustand'
+import { backend } from '@/lib/backend';
 
 
 export type DecodedToken = {
     id: string,
     teamName: string;
     accessCode: string;
+    gameId: string;
     isAdmin: boolean;
 };
 
@@ -49,11 +50,10 @@ export const useAuth = () => {
     const qc = useQueryClient()
     const tokenStore = useTokenStore()
     const { toAuth } = useAppNavigation()
-    const { publicCall } = useApi('auth')
 
     // ✅ helper is now a closure inside the hook — can use hooks' values
     const handleAuth = async (type: '/login' | '/register', payload: any) => {
-        const token = await publicCall<string>('post', type, payload)
+        const token = await backend.post<string>({ root: 'auth', route: type, payload })
         tokenStore.set(token)
         await qc.invalidateQueries({ queryKey: ['team', token] })
         return jwtDecode<DecodedToken>(token)
@@ -63,7 +63,7 @@ export const useAuth = () => {
     const register = async (teamName: string) => handleAuth('/register', teamName)
 
     const logout = () => {
-        qc.removeQueries({ queryKey: ['team', tokenStore.get()] })
+        qc.clear()
         tokenStore.clear()
         toAuth()
     }

@@ -3,9 +3,9 @@ import { Button, buttonVariants } from './ui/button'
 import { NavLink } from 'react-router'
 import RequireAdmin from './admin-guard'
 import { cn } from '@/lib/utils'
-import LogoutButton from '@/features/auth/components/logout-button'
+import { LogoutButton } from '@/features/auth/components/logout-button'
 import { RequireTeam } from './admin-guard'
-import ResetButton from '@/features/admin/components/reset-button'
+import ResetButton from '@/features/admin/components/buttons/reset-button'
 import { useTeam } from '@/features/auth/hooks/use-team'
 
 
@@ -24,26 +24,16 @@ export default function Header() {
             </div>
 
             <nav className='flex items-center gap-5' >
-                <RequireAdmin>
-                    <Button asChild variant="link">
-                        <NavLink
-                            to="/admin/manage"
-                            className={({ isActive }) =>
-                                isActive ? "underline" : undefined
-                            }
-                        >
-                            Admin
-                        </NavLink>
-                    </Button>
-                </RequireAdmin>
-
-
                 <RequireTeam>
                     <LogoutButton />
                 </RequireTeam>
                 <RequireAdmin>
                     <ResetButton />
                 </RequireAdmin>
+                <NavLink to='/how-to-play' className={({ isActive }) => isActive ? 'underline' : ''}>
+                    How To Play
+                </NavLink>
+
             </nav>
 
 

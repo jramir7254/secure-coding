@@ -1,13 +1,11 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { toast } from "sonner"
 import { gameKeys } from '@/features/game/hooks/use-game'
-import { useQuery, useMutation, useQueryClient, QueryClient } from "@tanstack/react-query";
-import { useApi, type BaseBackendResponse, type ApiError } from '@/hooks/use-api'
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { type GameOptions } from "@/features/admin/components/create-game-form";
-import type { queryClient } from '@/lib/query-client';
-import { socket } from '@/lib/socket';
 import { useSocket } from '@/hooks/use-socket';
 import { logger } from '@/lib/logger';
+import { backend, type BaseBackendResponse, type ApiError } from '@/lib/backend';
 
 
 export const adminKeys = {
@@ -16,12 +14,14 @@ export const adminKeys = {
 };
 
 export function useAdmin() {
-    const { call } = useApi('admin')
     const queryClient = useQueryClient();
 
     const resetDemo = async () => {
         try {
-            const { message } = await call<BaseBackendResponse>('post', '/reset')
+            const { message } = await backend.post<BaseBackendResponse>({
+                root: 'admin',
+                route: '/reset',
+            })
             toast.success(message)
             queryClient.invalidateQueries({ queryKey: gameKeys.all })
         } catch (error: unknown) {
@@ -64,27 +64,32 @@ export function useEndGame() {
 
 
 export function useCreateGame() {
-    const { call } = useApi('games')
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: (form: GameOptions) => call<GameSchema>('post', '/create', form),
+        mutationFn: (form: GameOptions) =>
+            backend.post<GameSchema>({
+                root: 'games',
+                route: '/create',
+                payload: form,
+            }),
         onSuccess: (data) => {
             toast.success(`Game #${data?.id} created successfully`)
-            queryClient.invalidateQueries({ queryKey: gameKeys.current() })
+            queryClient.invalidateQueries({ queryKey: gameKeys.current.base() })
         }
     });
 }
 
 export function useCloseGame() {
-    const { call } = useApi('games')
     const queryClient = useQueryClient();
-
 
     return useMutation({
         mutationFn: async () => {
             console.log('🟡 CloseGame mutation started');
-            const result = await call('post', '/close');
+            const result = await backend.post({
+                root: 'games',
+                route: '/close',
+            });
             console.log('🟢 CloseGame mutation finished');
             return result;
         },
@@ -98,19 +103,21 @@ export function useCloseGame() {
 }
 
 export type TeamSchema = {
-    id: number,
+    id: string,
     teamName: string,
-    accessCode: string,
-    gameId: number,
+    accessCode?: string,
+    gameId?: number,
     points?: number
 }
 
 export function useDeleteTeam() {
-    const { call } = useApi('admin')
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: (teamId: number) => call('delete', `/team/${teamId}`),
+        mutationFn: (teamId: number) => backend.delete({
+            root: 'admin',
+            route: `/team/${teamId}`,
+        }),
         onSuccess: (data, teamId) => {
             queryClient.setQueryData(adminKeys.teams, (oldTeams: any[] | undefined) => {
                 if (!oldTeams) return [];
@@ -122,31 +129,5 @@ export function useDeleteTeam() {
 
 }
 
-
-
-export function useCurrentGameTeams() {
-    const socket = useSocket();
-    const { call } = useApi('admin')
-    const queryClient = useQueryClient();
-
-    useEffect(() => {
-        if (!socket) return; // 👈 guard in case socket isn’t ready yet
-
-        socket?.on('team_joined', (data) => {
-            logger.info('[Socket]: "team_joined"')
-            queryClient.setQueryData(adminKeys.teams, (oldUsers: TeamSchema[]) => {
-                if (!oldUsers) return [data];
-                return [...oldUsers, data];
-            });
-        });
-
-        return () => { socket?.off('team_joined') };
-    }, []);
-
-    return useQuery({
-        queryKey: adminKeys.teams,
-        queryFn: () => call<TeamSchema[]>('get', '/teams'),
-    })
-}
 
 

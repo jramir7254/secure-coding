@@ -67,7 +67,7 @@ function getTime(): string {
 // Core formatting: timestamp, level, optional correlation ID
 function formatPrefix(level: LogLevel): string {
     const time = getTime();
-    const corr = correlationId ? `[ID:${correlationId}] ` : '';
+    const corr = correlationId ? `[${correlationId}] ` : '';
     return `%c${corr}[${time}] [${level.toUpperCase()}]%c`;
 }
 

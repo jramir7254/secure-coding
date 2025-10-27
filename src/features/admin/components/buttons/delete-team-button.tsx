@@ -27,12 +27,15 @@ export function DeleteTeamButton({ teamId, teamName }: { teamId: number, teamNam
                     <Trash />
                 </Button>
             </AlertDialogTrigger>
+
             <AlertDialogContent>
                 <AlertDialogHeader>
                     <AlertDialogTitle>Confirm delete team: {teamName}</AlertDialogTitle>
                 </AlertDialogHeader>
+
                 <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
+
                     <AlertDialogAction asChild>
                         <Button variant='destructive' onClick={() => deleteTeam.mutate(teamId)}>
                             Confirm

@@ -1,17 +1,19 @@
 import React, { useEffect } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 // import { socket } from '@/lib/socket';
-import { useApi } from '@/hooks/use-api';
 import { logger } from '@/lib/logger';
 import { useSocket } from '@/hooks/use-socket';
+import { backend } from '@/lib/backend';
+import { adminKeys, type TeamSchema } from '@/features/admin/hooks/use-admin';
 
 export interface GameSchema {
     id: string
     maxTeams: number
     isCurrent: boolean
     timeLimit: number
-    startedAt: number | string | null
-    endedAt: number | null
+    startedAt: string | null
+    endedAt: string | null
+    teamsPlayed?: number | null
 }
 
 
@@ -19,40 +21,51 @@ export interface GameSchema {
 export const gameKeys = {
     all: ['games'] as const,
     one: (gameId: number) => [...gameKeys.all, "one", gameId] as const,
-    current: () => [...gameKeys.all, "current"] as const,
+    current: {
+        base: () => [...gameKeys.all, "current"] as const,
+        teams: () => [...gameKeys.all, "current", "teams"] as const,
+        leaderboard: () => [...gameKeys.all, "current", "leaderboard"] as const,
+    },
+    results: (teamId: string) => [...gameKeys.all, 'results', teamId] as const,
     previous: () => [...gameKeys.all, "previous"] as const,
     leaderboard: () => [...gameKeys.all, "leaderboard"] as const,
-
 };
+
 
 
 export function useCurrentGame() {
     const socket = useSocket()
-    const { call } = useApi('games')
     const queryClient = useQueryClient()
 
     useEffect(() => {
-        if (!socket) return; // 👈 guard in case socket isn’t ready yet
+        if (!socket) return;
 
         socket.on('game_started', () => {
             logger.info('[Socket]: "game_started"')
-            queryClient.invalidateQueries({ queryKey: gameKeys.current() });
+            queryClient.invalidateQueries({ queryKey: gameKeys.current.base() });
         });
 
         return () => { socket.off('game_started') };
     }, []);
 
     return useQuery({
-        queryKey: gameKeys.current(),
-        queryFn: () => call<GameSchema | null>('get', '/current'),
+        queryKey: gameKeys.current.base(),
+        queryFn: () => backend.get<GameSchema | null>({ root: 'games', route: '/current' }),
     })
 }
+
+
+
+export function useGameStatus(game: GameSchema) {
+
+}
+
+
 
 
 export function useGame() {
     const socket = useSocket()
 
-    const { call } = useApi('games')
     const queryClient = useQueryClient()
 
 
@@ -62,7 +75,7 @@ export function useGame() {
         // Listen for incoming messages
         socket.on('game_started', (data) => {
             console.log('here2')
-            queryClient.invalidateQueries({ queryKey: gameKeys.current() });
+            queryClient.invalidateQueries({ queryKey: gameKeys.current.base() });
         });
 
         // Cleanup listener on unmount
@@ -72,35 +85,71 @@ export function useGame() {
     }, []);
 
     return useQuery({
-        queryKey: gameKeys.current(),
-        queryFn: () => call<GameSchema | null>('get', '/current'),
+        queryKey: gameKeys.current.base(),
+        queryFn: () => backend.get<GameSchema | null>({ root: 'games', route: '/current' }),
     })
 }
+
+
 
 
 export function usePastGames() {
-    const { call } = useApi('games')
-
     return useQuery({
         queryKey: gameKeys.previous(),
-        queryFn: () => call<GameSchema[]>('get', '/past'),
+        queryFn: () => backend.get<GameSchema[]>({ root: 'games', route: '/past' }),
     })
 }
 
 
+export type LeaderboardData = {
+    teamName: string,
+    teamId: string,
+    points: number,
+}
 
-/**
- * 
- * @returns 
- */
-export function useGameLeaderboard() {
+
+export function useCurrentGameLeaderboard() {
     const socket = useSocket()
-
-    const { call } = useApi('games')
     const queryClient = useQueryClient()
 
     useEffect(() => {
-        if (!socket) return; // 👈 guard in case socket isn’t ready yet
+        if (!socket) return;
+
+        socket.on('leaderboard_updated', (data: { teamId: string, score: number, teamName: string }) => {
+            logger.info('[Socket]: "leaderboard_updated"', data)
+            queryClient.setQueryData(gameKeys.current.leaderboard(), (old: LeaderboardData[]) => {
+                if (!old) return [{ ...data }]
+                if (!old.some(l => l.teamId === data.teamId)) return [...old, { ...data, points: data.score }]
+                return old.map(l => l.teamId === data.teamId ? { ...l, points: l.points + data.score } : l)
+            })
+            queryClient.invalidateQueries({ queryKey: gameKeys.current.leaderboard(), refetchType: 'none' });
+        });
+
+        return () => { socket.off('leaderboard_updated') };
+    }, []);
+
+    return useQuery({
+        queryKey: gameKeys.current.leaderboard(),
+        queryFn: () => backend.get<LeaderboardData[]>({ root: 'games', route: '/current/leaderboard' }),
+    })
+}
+
+
+export function useTeamResults(teamdId: string) {
+
+    return useQuery({
+        queryKey: gameKeys.results(teamdId),
+        queryFn: () => backend.get<TeamSchema[]>({ root: 'games', route: `/teams/${teamdId}/results` }),
+    })
+}
+
+
+export function useOverallLeaderboard() {
+    const socket = useSocket()
+    const queryClient = useQueryClient()
+
+    useEffect(() => {
+        if (!socket) return;
 
         socket.on('leaderboard_updated', (data) => {
             logger.info('[Socket]: "leaderboard_updated"')
@@ -112,6 +161,35 @@ export function useGameLeaderboard() {
 
     return useQuery({
         queryKey: gameKeys.leaderboard(),
-        queryFn: () => call('get', '/leaderboard'),
+        queryFn: () => backend.get<TeamSchema[]>({ root: 'games', route: '/all/leaderboard' }),
+    })
+}
+
+
+
+
+
+
+export function useCurrentGameTeams() {
+    const socket = useSocket();
+    const queryClient = useQueryClient();
+
+    useEffect(() => {
+        if (!socket) return;
+
+        socket?.on('team_joined', (data) => {
+            logger.info('[Socket]: "team_joined"')
+            queryClient.setQueryData(gameKeys.current.teams(), (oldTeams: TeamSchema[]) => {
+                if (!oldTeams) return [data];
+                return [data, ...oldTeams];
+            });
+        });
+
+        return () => { socket?.off('team_joined') };
+    }, []);
+
+    return useQuery({
+        queryKey: gameKeys.current.teams(),
+        queryFn: () => backend.get<TeamSchema[]>({ root: 'games', route: '/current/teams' }),
     })
 }
