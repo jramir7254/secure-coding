@@ -18,6 +18,15 @@ export function DevBlock({ children, className }: BlockProps) {
 }
 
 
+export function Screen({ children, className }: BlockProps) {
+    return (
+        <div className={`size-full ${className}`}>
+            {children}
+        </div>
+    )
+}
+
+
 export function Block({ children, className }: BlockProps) {
     return (
         <div className={`bg-accent border overflow-hidden rounded-md ${className}`}>

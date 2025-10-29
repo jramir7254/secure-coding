@@ -1,10 +1,11 @@
 import React, { useEffect } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-// import { socket } from '@/lib/socket';
 import { logger } from '@/lib/logger';
 import { useSocket } from '@/hooks/use-socket';
 import { backend } from '@/lib/backend';
 import { adminKeys, type TeamSchema } from '@/features/admin/hooks/use-admin';
+
+
 
 export interface GameSchema {
     id: string
@@ -177,7 +178,7 @@ export function useCurrentGameTeams() {
     useEffect(() => {
         if (!socket) return;
 
-        socket?.on('team_joined', (data) => {
+        socket.on('team_joined', (data) => {
             logger.info('[Socket]: "team_joined"')
             queryClient.setQueryData(gameKeys.current.teams(), (oldTeams: TeamSchema[]) => {
                 if (!oldTeams) return [data];
@@ -185,7 +186,7 @@ export function useCurrentGameTeams() {
             });
         });
 
-        return () => { socket?.off('team_joined') };
+        return () => { socket.off('team_joined') };
     }, []);
 
     return useQuery({

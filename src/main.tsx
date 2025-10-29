@@ -16,6 +16,7 @@ import LetterGlitch from './components/letters';
 import QuestionsPage from './features/admin/questions-page';
 import GamesPage from './features/admin/games-page';
 import TeamsPage from './features/admin/teams-page';
+import TestPage from './features/testing/test-page';
 
 
 export default function App() {
@@ -28,6 +29,7 @@ export default function App() {
                     {/* Public */}
                     <Route path="/" element={<AuthPage />} />
                     <Route path="/how-to-play" element={<HowToPlayPage />} />
+                    <Route path="/test" element={<TestPage />} />
 
                     {/* Protected: Player routes */}
                     <Route element={<RequireAuth />}>
@@ -41,6 +43,7 @@ export default function App() {
                     {/* Protected: Admin routes */}
                     <Route element={<RequireAuth requireAdmin />}>
                         <Route path="/admin/manage" element={<AdminPage />} >
+                            <Route index element={<Navigate replace to='games' />} />
                             <Route path='games' element={<GamesPage />} />
                             <Route path='questions' element={<QuestionsPage />} />
                             <Route path='teams' element={<TeamsPage />} />

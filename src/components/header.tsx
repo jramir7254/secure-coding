@@ -7,7 +7,7 @@ import { LogoutButton } from '@/features/auth/components/logout-button'
 import { RequireTeam } from './admin-guard'
 import ResetButton from '@/features/admin/components/buttons/reset-button'
 import { useTeam } from '@/features/auth/hooks/use-team'
-
+import CountdownTimer from './blocks/timer'
 
 
 export default function Header() {
@@ -23,6 +23,8 @@ export default function Header() {
                 <h3 className='font-bebas text-4xl tracking-wider'>Secure Coding</h3>
             </div>
 
+            {/* <CountdownTimer /> */}
+
             <nav className='flex items-center gap-5' >
                 <RequireTeam>
                     <LogoutButton />
@@ -32,6 +34,15 @@ export default function Header() {
                 </RequireAdmin>
                 <NavLink to='/how-to-play' className={({ isActive }) => isActive ? 'underline' : ''}>
                     How To Play
+                </NavLink>
+                <RequireAdmin>
+
+                    <NavLink to='/admin/manage' className={({ isActive }) => isActive ? 'underline' : ''}>
+                        Admin
+                    </NavLink>
+                </RequireAdmin>
+                <NavLink to='/test' className={({ isActive }) => isActive ? 'underline' : ''}>
+                    Test
                 </NavLink>
 
             </nav>
