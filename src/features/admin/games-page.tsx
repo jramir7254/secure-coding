@@ -62,7 +62,17 @@ export default function GamesPage() {
                     </>
                 }
                 <Separator />
+                <h2 className='font-nunit font-bold text-2xl mb-5'>Teams Joined</h2>
+                <ScrollArea className='h-full max-h-[50%]'>
 
+                    {currentTeams && currentTeams.map(t =>
+                        <TeamCard key={`${t.teamName}-${t.id}`} team={t} >
+                            <p>{t.accessCode}</p>
+                            <DeleteTeamButton teamId={t.id} teamName={t.teamName} />
+                        </TeamCard>
+                    )}
+
+                </ScrollArea>
             </Section>
 
 

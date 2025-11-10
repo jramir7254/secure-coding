@@ -25,7 +25,7 @@ import { toast } from "sonner"
 
 const formSchema = z.object({
     maxTeams: z.int().min(1, "Minimun 1 team").max(30, "Maximum 30 Teams"),
-    timeLimit: z.int().min(1, "Minimun 5 minutes").max(60, "Maximum 60 minutes"),
+    timeLimit: z.int().min(1, "Minimun 5 minutes").max(600, "Maximum 60 minutes"),
 })
 
 export type GameOptions = z.infer<typeof formSchema>

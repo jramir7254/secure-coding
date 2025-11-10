@@ -1,10 +1,12 @@
 import { useCurrentGameLeaderboard } from '../../hooks/use-game'
 import TeamCard from '@/components/blocks/team-card'
 import { motion } from "motion/react"
+import { useTeam } from '@/features/auth/hooks/use-team'
 
 
 export default function LeaderBoard() {
     const { data: leaderboard } = useCurrentGameLeaderboard()
+    const { data: team } = useTeam()
 
     const getPlace = (place: number | undefined) => {
         // if (!place) return "";
@@ -15,13 +17,13 @@ export default function LeaderBoard() {
 
     return (
         <motion.div layout className="space-y-3">
-            {leaderboard?.sort((a, b) => b.points - a.points).map((i, place) => (
+            {leaderboard?.sort((a, b) => b.totalPoints - a.totalPoints).map((i, place) => (
                 <motion.div key={`leaderboard-${i.teamId}`} layout transition={{ duration: 0.4, ease: "easeInOut" }}>
                     <TeamCard
                         className={getPlace(place)}
-                        team={{ id: i.teamId, points: i.points, teamName: i.teamName }}
+                        team={{ id: i.teamId, totalPoints: i.totalPoints, teamName: i.teamName }}
                     >
-                        <p>{i.points}</p>
+                        <p>{i.totalPoints}</p>
                     </TeamCard>
                 </motion.div>
             ))}

@@ -2,6 +2,7 @@
 import { useQuery } from '@tanstack/react-query';
 
 import { decodeToken, useTokenStore } from './use-auth';
+import type { DecodedToken } from './use-auth';
 // import { tokenStore } from './use-auth';
 
 export function useTeam() {

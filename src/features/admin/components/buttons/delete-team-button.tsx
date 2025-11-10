@@ -13,7 +13,7 @@ import {
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 
-export function DeleteTeamButton({ teamId, teamName }: { teamId: number, teamName: string }) {
+export function DeleteTeamButton({ teamId, teamName }: { teamId: string, teamName: string }) {
     const deleteTeam = useDeleteTeam()
 
     return (
@@ -22,7 +22,7 @@ export function DeleteTeamButton({ teamId, teamName }: { teamId: number, teamNam
                 <Button
                     variant="outline"
                     size="icon"
-                    className="hover:!bg-destructive hover:!text-destructive-foreground hover:!border-transparent"
+                    className="hover:bg-destructive! hover:text-destructive-foreground! hover:border-transparent!"
                 >
                     <Trash />
                 </Button>

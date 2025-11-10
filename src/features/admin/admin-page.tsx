@@ -1,13 +1,16 @@
 import { Block } from '@/components/blocks'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { NavLink, Outlet } from 'react-router'
+import { NavLink, Outlet, useLocation } from 'react-router'
 
 
 export default function AdminPage() {
+    const location = useLocation().pathname.split('/')
+
+    const currentLocation = location[location.length - 1]
 
     return (
         <Block className='flex-1  gap-5 m-5'>
-            <Tabs defaultValue='games' className='px-7 pt-5'>
+            <Tabs defaultValue={currentLocation} className='px-7 pt-5'>
                 <TabsList>
                     <TabsTrigger value='games' asChild>
                         <NavLink to='games'>Games</NavLink>

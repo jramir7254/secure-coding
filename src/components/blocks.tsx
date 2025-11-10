@@ -1,12 +1,14 @@
 import React from 'react'
 
 import { Card, } from './ui/card'
+import { cn } from '@/lib/utils'
 
 type BlockProps = {
     children: React.ReactNode,
     className?: string
     direction?: 'row' | 'col'
     centered?: boolean
+    fill?: boolean
 } & React.ComponentProps<'div'>
 
 export function DevBlock({ children, className }: BlockProps) {
@@ -27,9 +29,62 @@ export function Screen({ children, className }: BlockProps) {
 }
 
 
-export function Block({ children, className }: BlockProps) {
+export function Block({ children, className, fill, ...props }: BlockProps) {
     return (
-        <div className={`bg-accent border overflow-hidden rounded-md ${className}`}>
+        <div className={`bg-accent border overflow-hidden rounded-md ${className}`} {...props}>
+            {children}
+        </div>
+    )
+}
+
+
+export function Content({ children, className, fill, ...props }: BlockProps) {
+    return (
+        <div className={className} {...props}>
+            {children}
+        </div>
+    )
+}
+export function Container({ children, className, fill, ...props }: BlockProps) {
+    return (
+        <div className={className} {...props}>
+            {children}
+        </div>
+    )
+}
+
+export function SideContent({ children, className, fill, ...props }: BlockProps) {
+    return (
+        <aside className={className} {...props}>
+            {children}
+        </aside>
+    )
+}
+
+export function HeaderContent({ children, className, fill, ...props }: BlockProps) {
+    return (
+        <header className={className} {...props}>
+            {children}
+        </header>
+    )
+}
+
+
+export function FooterContent({ children, className, fill, ...props }: BlockProps) {
+    return (
+        <footer className={className} {...props}>
+            {children}
+        </footer>
+    )
+}
+
+
+export function Grid({ children, className, rows = 1, cols = 1, ...props }: BlockProps & { rows?: number, cols?: number }) {
+    return (
+        <div className={cn(
+            `grid grid-cols-${cols} grid-rows-${rows}`,
+            className
+        )} {...props}>
             {children}
         </div>
     )
@@ -44,9 +99,9 @@ export function Section({ children, className }: BlockProps) {
     )
 }
 
-export function Flex({ children, className, direction = 'col', centered, ...props }: BlockProps) {
+export function Flex({ children, className, direction = 'col', centered, fill, ...props }: BlockProps) {
     return (
-        <div className={`flex flex-${direction} ${centered ? 'items-center justify-center' : ''} ${className}`} {...props}>
+        <div className={`flex flex-${direction} ${centered ? 'items-center justify-center' : ''} ${fill ? 'flex-1' : ''} ${className}`} {...props}>
             {children}
         </div>
     )

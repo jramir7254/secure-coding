@@ -32,18 +32,18 @@ export default function Header() {
                 <RequireAdmin>
                     <ResetButton />
                 </RequireAdmin>
-                <NavLink to='/how-to-play' className={({ isActive }) => isActive ? 'underline' : ''}>
+                {/* <NavLink to='/how-to-play' className={({ isActive }) => isActive ? 'underline' : ''}>
                     How To Play
-                </NavLink>
+                </NavLink> */}
                 <RequireAdmin>
 
                     <NavLink to='/admin/manage' className={({ isActive }) => isActive ? 'underline' : ''}>
                         Admin
                     </NavLink>
+                    <NavLink to='/test' className={({ isActive }) => isActive ? 'underline' : ''}>
+                        Test
+                    </NavLink>
                 </RequireAdmin>
-                <NavLink to='/test' className={({ isActive }) => isActive ? 'underline' : ''}>
-                    Test
-                </NavLink>
 
             </nav>
 

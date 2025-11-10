@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { toast } from "sonner"
-import { gameKeys } from '@/features/game/hooks/use-game'
+import { gameKeys } from '@/features/game/hooks/query-keys';
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { type GameOptions } from "@/features/admin/components/create-game-form";
 import { useSocket } from '@/hooks/use-socket';

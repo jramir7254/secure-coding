@@ -1,5 +1,5 @@
 import { isAxiosError } from "axios";
-import { logger, setCorrelationId } from "@/lib/logger";
+import { logger, setCorrelationId, clearCorrelationId } from "@/lib/logger";
 import { BackendApi } from "./api";
 
 
@@ -26,24 +26,68 @@ export const backend = {
     patch: <T>({ root, route = '', payload }: CallParams) => apiCall<T>('patch', root, route, payload),
 }
 
-
-// Generic API wrapper
-export async function apiCall<T>(method: HttpMethods, root: string, route?: string, payload?: any): Promise<T> {
+export async function apiCall<T>(
+    method: HttpMethods,
+    root: string,
+    route = '',
+    payload?: any
+): Promise<T> {
     try {
-        setCorrelationId(`${method.toUpperCase()}: ${root}${route}`)
-        logger.debug(`request:`, { path: `/${root}${route}`, method, root, route, payload })
-        const { data } = await BackendApi[method]<T>(`/${root}${route}`, payload);
-        logger.debug(`response:`, { data })
-        return data;
-    } catch (err: any) {
-        logger.error('raw error:', err)
-        const error: ApiError = err.response?.data || {
-            success: false,
-            message: "Unknown error",
-            code: "UNKNOWN",
-        }
-        logger.error('normalized error:', error)
+        setCorrelationId(`${method.toUpperCase()}: ${root}${route}`);
+        logger.debug(`request:`, { path: `/${root}${route}`, method, root, route, payload });
 
-        return Promise.reject(error)
+        const { data } = await BackendApi[method]<T>(`/${root}${route}`, payload);
+
+        const normalized = normalizeJsonStrings(data);
+
+        logger.debug(`response (normalized):`, { data: normalized });
+
+        return normalized;
+    } catch (err: any) {
+        logger.error('raw error:', err);
+        const error: ApiError =
+            err.response?.data || {
+                success: false,
+                message: 'Unknown error',
+                code: 'UNKNOWN',
+            };
+        logger.error('normalized error:', error);
+
+        return Promise.reject(error);
+    } finally {
+        clearCorrelationId();
     }
 }
+
+// utils/normalizeJsonStrings.ts
+
+export function normalizeJsonStrings(data: any): any {
+    if (Array.isArray(data)) {
+        return data.map(normalizeJsonStrings);
+    }
+
+    if (data && typeof data === 'object') {
+        const normalized: Record<string, any> = {};
+        for (const [key, value] of Object.entries(data)) {
+            normalized[key] = normalizeJsonStrings(value);
+        }
+        return normalized;
+    }
+
+    if (typeof data === 'string') {
+        const trimmed = data.trim();
+        // Try to parse if it looks like JSON
+        if ((trimmed.startsWith('{') && trimmed.endsWith('}')) || (trimmed.startsWith('[') && trimmed.endsWith(']'))) {
+            try {
+                const parsed = JSON.parse(trimmed);
+                // Recursively normalize parsed content too
+                return normalizeJsonStrings(parsed);
+            } catch {
+                return data; // leave it as-is if invalid JSON
+            }
+        }
+    }
+
+    return data;
+}
+

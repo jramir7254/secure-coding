@@ -1,28 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner';
 import { backend } from '@/lib/backend';
+import { questionKeys } from './query-keys';
 
-export const questionKeys = {
-    root: ['questions'] as const,
-    list: {
-        base: () => [...questionKeys.root, "list"] as const,
-        attempts: {
-            team: (teamId: string) => [...questionKeys.list.base(), "attempts", "teams", teamId] as const,
-        }
-    },
-    current: () => [...questionKeys.root, "current"] as const,
-    previous: () => [...questionKeys.root, "previous"] as const,
-
-    detail: {
-        root: () => [...questionKeys.root, "detail"] as const,
-        read: (questionId: string) => [...questionKeys.root, "detail", questionId] as const,
-    },
-};
+import type { GetCurrentQuestionResponse, Question, QuestionTags, QuestionAttempt } from '../types/questions';
 
 
-export type AnswerChoices = 'runtime' | 'logic' | 'compile' | 'vulnerability' | null;
+export type AnswerChoices = QuestionTags
 export type QuestionVariant = 'multiple' | 'coding' | null
-export type Question = { id: number, code: string, explanation: string, editableRanges?: number[], answer?: string, expectedOutput?: string }
 
 
 export type GetQuestionResponse = {
@@ -33,16 +18,16 @@ export type GetQuestionResponse = {
 }
 
 export type MultipleChoicePayload = {
-    questionId: number,
-    attemptId: number,
-    questionType: QuestionVariant
+    questionData: Question,
+    attemptData: QuestionAttempt,
 }
 
 
 export type MultipleChoiceResponse = {
     score: number,
-    attemptId: number,
-    questionType: QuestionVariant
+    questionData: Question,
+    attemptData: QuestionAttempt,
+    output: string
 }
 
 
@@ -59,22 +44,24 @@ export function useQuestions() {
 export function useCurrentQuestion() {
     return useQuery({
         queryKey: questionKeys.current(),
-        queryFn: () => backend.get<GetQuestionResponse>({ root: 'questions', route: '/current' }),
+        queryFn: () => backend.get<GetCurrentQuestionResponse>({ root: 'questions', route: '/current' }),
     })
 }
 
 
-export function useMultipleChoiceAttempt(payload: MultipleChoicePayload) {
+
+
+export function useMultipleChoiceAttempt(payload: any) {
     const qc = useQueryClient();
 
     return useMutation({
-        mutationFn: (selectedAnswer: AnswerChoices) =>
+        mutationFn: (submittedAnswers: AnswerChoices[]) =>
             backend.post<MultipleChoiceResponse>({
                 root: 'questions',
                 route: '/attempt',
                 payload: {
                     ...payload,
-                    selectedAnswer,
+                    submittedAnswers,
                 },
             }),
 
@@ -109,6 +96,38 @@ export function useCodingAttempt(payload: MultipleChoicePayload) {
                 payload: {
                     ...payload,
                     submittedCode,
+                },
+            }),
+
+        onSuccess: (data) => {
+            // Update the cache for the "current question"
+            toast.success(`Scored ${data?.score || -1} on this question`)
+            qc.setQueryData<MultipleChoiceResponse>(
+                questionKeys.current(),
+                (old) => {
+                    if (!old) return old; // no cache yet
+                    return {
+                        ...data
+                    };
+                }
+            );
+        },
+    });
+}
+
+
+
+
+export function useCurrentQuestionAttempt() {
+    const qc = useQueryClient();
+
+    return useMutation({
+        mutationFn: (payload: any) =>
+            backend.post<MultipleChoiceResponse>({
+                root: 'questions',
+                route: '/attempt',
+                payload: {
+                    ...payload,
                 },
             }),
 

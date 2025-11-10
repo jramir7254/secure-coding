@@ -26,6 +26,7 @@
     --font-srcco: "Source Code Pro", monospace;
     --font-jsans: "Julius Sans One", sans-serif;
     --font-bebas: "Bebas Neue", sans-serif;
+    --font-consolas: Consolas, "Lucida Console", Monaco, monospace;
 
     /* === color-CYBER PURPLE THEME === */
     --color-cyber-bg-start: #0b1022;
@@ -88,6 +89,8 @@
     --color-atom-error: #BE1100;
 
     --color-matte-black: #1A1A1A;
+
+    --color-vs-sidebar: #21252b;
 
     --animate-rotate-border: border-rotate 60s ease infinite;
 
