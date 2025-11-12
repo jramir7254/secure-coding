@@ -1,6 +1,10 @@
 import React from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useCodeEditor } from '../../context/editor-context'
+import { FaJava } from "react-icons/fa";
+import { FaMarkdown } from "react-icons/fa";
+import { VscJson } from "react-icons/vsc";
+import { CiTextAlignLeft } from "react-icons/ci";
 
 
 export default function FileTabs() {
@@ -24,6 +28,7 @@ export default function FileTabs() {
                         value={cf.name}
                         onClick={() => setCurrentFile(cf)}
                     >
+                        {/* <FaJava /> */}
                         {cf.name}
                     </TabsTrigger>
                 ))}

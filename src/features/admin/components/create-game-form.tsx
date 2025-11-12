@@ -37,7 +37,7 @@ export default function CreateGameForm() {
         resolver: zodResolver(formSchema),
         defaultValues: {
             maxTeams: 5,
-            timeLimit: 5,
+            timeLimit: 600,
         },
     })
 

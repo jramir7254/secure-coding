@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import MonacoEditor, { useMonaco, type Monaco } from '@monaco-editor/react';
 import { constrainedEditor } from 'constrained-editor-plugin';
 import type * as monacoType from 'monaco-editor';
-import type { CodeFile, Question } from '../../types/questions';
 import { logger } from '@/lib/logger';
 import { useCodeEditor } from '../../context/editor-context'
 
@@ -35,14 +34,34 @@ export default function Editor() {
             logger.debug('Editable range length:', rangeData.length);
 
             // Example expected format: [startLine, startColumn, endLine, endColumn]
-            if (Array.isArray(rangeData) && rangeData.length === 4) {
+            if (Array.isArray(rangeData) && rangeData.length >= 1) {
                 logger.info('Adding restrictions:', rangeData);
 
-                constrainedRef.current.addRestrictionsTo(model, [
-                    {
-                        range: rangeData,
-                    },
-                ]);
+
+                const ranges = rangeData.map(range => {
+                    logger.debug(`ranges[range]: ${range}`)
+                    if (range.length <= 2) {
+                        logger.debug(`range.length == 2: ${range.length <= 2}`)
+
+                        return {
+                            range: [range[0], model?.getLineMaxColumn(range[0]), range[1], model?.getLineMaxColumn(range[1])]
+                        }
+                    } else {
+                        logger.debug(`range.length == 4: ${range.length >= 4}`)
+
+                        return {
+                            range
+                        }
+                    }
+                })
+
+                logger.table(ranges);
+                logger.debug('ranges', ranges);
+
+
+
+
+                constrainedRef.current.addRestrictionsTo(model, ranges);
 
                 // Optional: highlight editable area
                 (model as any).toggleHighlightOfEditableAreas?.({
@@ -101,7 +120,7 @@ export default function Editor() {
 
 
 
-    const readOnly = typeof currentFile === 'object' && currentFile?.editableRanges[0] === 'readonly' ? true : false;
+    const readOnly = typeof currentFile === 'object' && currentFile?.editableRanges.length === 0 ? true : false;
 
 
 

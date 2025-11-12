@@ -5,6 +5,8 @@ export type QuestionTags = 'runtime' | 'logic' | 'compile' | 'vulnerability' | n
 export type QuestionTypes = 'mcq' | 'break' | 'fix' | 'exploit' | 'coding' | null
 export type Difficulties = 'easy' | 'medium' | 'hard'
 
+type RestrictedRanges = [number, number, number, number] | [number, number]
+
 
 export interface CodeFile {
     id: string
@@ -13,7 +15,7 @@ export interface CodeFile {
     language: string,
     value: string,
     displayOrder: number
-    editableRanges: number[] | ['readonly']
+    editableRanges: RestrictedRanges[] | []
 }
 
 

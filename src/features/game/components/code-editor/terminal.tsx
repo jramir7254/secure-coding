@@ -1,10 +1,11 @@
 import { Block } from '@/components/blocks'
-import React from 'react'
 import { useTeam } from '@/features/auth/hooks/use-team'
 import { ScrollArea } from '@/components/ui'
 import { useCodeEditor } from '../../context/editor-context'
 import { Eraser } from 'lucide-react'
 import { Button } from '@/components/ui'
+
+
 
 export default function OutputTerminal() {
     const { data } = useTeam()
@@ -20,9 +21,9 @@ export default function OutputTerminal() {
         <Block hidden={shouldHide} className='font-nunit bg-editor-bg h-full rounded-none p-2 border-l-0 relative'>
             <Button size='icon' onClick={clearTerminal} variant='default' className='absolute top-5 right-5 z-1'><Eraser /></Button>
             <ScrollArea className='h-full'>
-                {codeOutput.map(o => (
+                {codeOutput.map(out => (
                     <>
-                        <p className=''>{o}</p>
+                        <pre className='font-nunit'>{out}</pre>
                         <CommandLine teamName={teamName} />
                     </>
                 ))}

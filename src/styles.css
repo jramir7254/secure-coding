@@ -20,7 +20,7 @@ main {
 }
 
 .monaco-editor .editable-multiline-highlight {
-    background-color: rgba(100, 200, 255, 0.25);
+    background-color: rgba(0, 0, 0, 0.25);
 }
 
 .editable-highlight {

@@ -47,7 +47,9 @@ function QuestionView() {
     return (
         <div className='h-full flex'>
             <Editor />
-
+            {/* <div className='w-[50%] flex items-center justify-center'>
+                <QuizButtons data={data} />
+            </div> */}
         </div>
     )
 }

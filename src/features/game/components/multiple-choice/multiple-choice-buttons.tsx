@@ -51,7 +51,7 @@ export function QuizButtons({ data }: { data: GetCurrentQuestionResponse }) {
     };
 
     return (
-        <div hidden={shouldHide} className="flex flex-col gap-2">
+        <div hidden={shouldHide} className="flex flex-col items-center gap-2 py-5">
             {order.map((opt) => {
                 const isActive = selected.includes(opt.value);
                 return (
@@ -60,6 +60,7 @@ export function QuizButtons({ data }: { data: GetCurrentQuestionResponse }) {
                         key={opt.value}
                         onClick={() => toggleSelect(opt.value)}
                         className={`
+                            w-[75%]
               transition-colors
               ${isActive ? "bg-primary text-white" : "bg-secondary text-white"}
               ${isIncorrect && isActive ? "bg-destructive text-white" : ""}
@@ -77,7 +78,7 @@ export function QuizButtons({ data }: { data: GetCurrentQuestionResponse }) {
                 );
             })}
 
-            <Button className="w-full" onClick={handleSubmit}>
+            <Button className=" w-[75%] mt-5" onClick={handleSubmit}>
                 Submit
             </Button>
         </div>

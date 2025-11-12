@@ -23,14 +23,18 @@ export default function CodeEditor() {
         const model = editor.getModel();
         constrainedInstance.addRestrictionsTo(model, [
             {
-                range: [2, 3, 5, model?.getLineMaxColumn(5)], // Range of Util Variable name
+                range: [1, model?.getLineMaxColumn(1), 5, model?.getLineMaxColumn(5)], // Range of Util Variable name
+                allowMultiline: true,
+
                 label: "utilName",
             },
             {
-                range: [3, 1, 3, 1], // Range of Function definition
+                range: [8, model?.getLineMaxColumn(8), 20, model?.getLineMaxColumn(20)], // Range of Util Variable name
                 allowMultiline: true,
-                label: "funcDefinition",
+
+                label: "utilName",
             },
+
         ]);
         model?.toggleHighlightOfEditableAreas({
             cssClassForSingleLine: 'editable-singleline-highlight',
@@ -64,7 +68,7 @@ export default function CodeEditor() {
             </Tabs>
 
             <Editor
-                className='rounded-md overflow-hidden bg-[#1e1e1e] pt-4'
+                className='rounded-md overflow-hidden bg-[#1e1e1e] pt-4 size-full'
 
                 height="50%"
                 width={'50%'}
@@ -92,7 +96,7 @@ const files = {
         name: 'script.js',
         language: 'java',
         value: `
-            import java.util.*;
+import java.util.*;
 
 public class SensorMonitor {
     public static void main(String[] args) {

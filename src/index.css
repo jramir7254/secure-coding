@@ -1,5 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@plugin "@tailwindcss/typography";
+
 
 @custom-variant dark (&:is(.dark *));
 
@@ -8,6 +10,22 @@
     inherits: false;
     initial-value: 0deg;
 }
+
+.prose code::before,
+.prose code::after {
+    content: none !important;
+}
+
+.prose code {
+    background-color: rgba(128, 128, 128, 0.15);
+    color: #e2e8f0;
+    /* or your preferred text color */
+    padding: 0.2em 0.4em;
+    border-radius: 0.3em;
+    font-size: 0.95em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
 
 @theme {
     --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif,
