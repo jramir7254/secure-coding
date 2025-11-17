@@ -10,18 +10,21 @@ import {
     ResizablePanel,
     ResizablePanelGroup,
 } from "@/components/ui/resizable"
-import { useCurrentQuestion } from '../../hooks/use-question'
+import { useCurrentQuestion, useCurrentAttempt } from '../../hooks/use-question'
 import { QuizButtons } from '../multiple-choice/multiple-choice-buttons'
 import CountUpTimer from '@/components/blocks/countup'
 import Instructions from '../shared/instructions'
+import { Badge } from '@/components/ui/badge'
+import DifficultyBadge from '../shared/difficulty-badge'
+import NextButton from '../shared/next-button'
 
 export default function CodeEditor() {
     const { currentFile } = useCodeEditor()
-    const { data } = useCurrentQuestion()
+    const questionData = useCurrentQuestion()
+    const attemptData = useCurrentAttempt()
 
-    if (!data) return
+    if (!questionData || !attemptData) return
 
-    const { attemptData, questionData } = data
 
 
     return (
@@ -38,11 +41,12 @@ export default function CodeEditor() {
                 <ResizablePanelGroup direction='vertical' className='col-span-9 row-span-2 size-full'>
                     <ResizablePanel defaultSize={75} className=''>
                         <HeaderContent className="flex justify-between items-center p-2 bg-editor-bg">
-                            <div>{questionData.difficulty}</div>
+                            <DifficultyBadge difficulty={questionData.difficulty} />
                             <CountUpTimer />
                             <div className='ml-auto'>
                                 <RunButton />
                             </div>
+                            <NextButton />
                         </HeaderContent>
 
                         <div hidden={currentFile === 'instructions'} className='size-full'>

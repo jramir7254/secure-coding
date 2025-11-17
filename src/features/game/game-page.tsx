@@ -38,9 +38,9 @@ export default function GamePage() {
 
 
 function QuestionView() {
-    const { data } = useCurrentQuestion()
+    const question = useCurrentQuestion()
 
-    if (!data) return <p>No question</p>
+    if (!question) return <p>No question</p>
     // if (!('question' in data)) return <p>{(data as any).message || 'No question'}</p>
 
 

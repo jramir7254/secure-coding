@@ -105,7 +105,7 @@ export function useCloseGame() {
 export type TeamSchema = {
     id: string,
     teamName: string,
-    accessCode?: string,
+    joinCode?: string,
     gameId?: number,
     points?: number
 }

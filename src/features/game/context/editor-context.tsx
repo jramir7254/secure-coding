@@ -1,13 +1,14 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import type { CodeFile, Question } from '../types/questions';
-import { useCurrentQuestion } from '../hooks/use-question';
+import { useCurrentQuestion, useCurrentAttempt } from '../hooks/use-question';
+import { logger } from '@/lib/logger';
 export type CodeEditorContextType = ReturnType<typeof _useCodeEditorValues>;
 
 
 
 function _useCodeEditorValues() {
-    const { data, isLoading } = useCurrentQuestion();
-    const question = data?.questionData;
+    const question = useCurrentQuestion();
+    const attempt = useCurrentAttempt();
 
     const [currentFile, setCurrentFile] = useState<CodeFile | 'instructions'>("instructions");
     const [codeOutput, setCodeOutput] = useState([""]);
@@ -19,6 +20,11 @@ function _useCodeEditorValues() {
     const clearTerminal = () => {
         setCodeOutput([""])
     }
+
+    useEffect(() => {
+        logger.debug(`[attempt.id]: ${attempt?.id}`)
+        setCurrentFile('instructions')
+    }, [attempt?.id])
 
     // Set initial file once data is loaded
 
@@ -39,7 +45,6 @@ function _useCodeEditorValues() {
         pushToTerminal,
         setCodeOutput,
         clearTerminal,
-        isLoading,
         question
     };
 }

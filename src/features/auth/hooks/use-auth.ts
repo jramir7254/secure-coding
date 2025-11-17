@@ -8,7 +8,7 @@ import { backend } from '@/lib/backend';
 export type DecodedToken = {
     id: string,
     teamName: string;
-    accessCode: string;
+    joinCode: string;
     gameId: string;
     isAdmin: boolean;
 };

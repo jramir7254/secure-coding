@@ -23,7 +23,7 @@ export interface Question {
     id: number
     title: string
     type: QuestionTypes
-    difficulty: number[]
+    difficulty: Difficulties
     tags: QuestionTags[]
     description?: string
     explanation?: string
@@ -36,7 +36,7 @@ export interface QuestionAttempt {
     questionId: string
     teamId: string
     startedAt: string
-    completedAt: string
+    completedAt: string | null
     score: number
 }
 

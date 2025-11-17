@@ -41,7 +41,7 @@ export function useQuestions() {
 
 
 
-export function useCurrentQuestion() {
+export function useCurrentQuestionAttempt() {
     return useQuery({
         queryKey: questionKeys.current(),
         queryFn: () => backend.get<GetCurrentQuestionResponse>({ root: 'questions', route: '/current' }),
@@ -49,6 +49,36 @@ export function useCurrentQuestion() {
 }
 
 
+
+
+export function useCurrentQuestion() {
+    const { data, isLoading } = useCurrentQuestionAttempt()
+
+    if (isLoading || !data) return
+
+    return data.questionData
+}
+
+
+export function useCurrentAttempt() {
+    const { data, isLoading } = useCurrentQuestionAttempt()
+
+    if (isLoading || !data) return
+
+    return data.attemptData
+}
+
+export function useIsAttemptComplete() {
+    const attempt = useCurrentAttempt()
+
+    if (!attempt) return false
+
+    return !!attempt.completedAt
+}
+
+
+export function useQuestionAttempt(payload: any) {
+}
 
 
 export function useMultipleChoiceAttempt(payload: any) {
@@ -74,8 +104,10 @@ export function useMultipleChoiceAttempt(payload: any) {
                     if (!old) return old; // no cache yet
                     return {
                         ...old,
-                        attemptId: data.attemptId,
-                        questionType: data.questionType,
+                        attemptData: {
+                            ...old.attemptData,
+                            completedAt: new Date()
+                        }
                     };
                 }
             );
@@ -116,36 +148,6 @@ export function useCodingAttempt(payload: MultipleChoicePayload) {
 }
 
 
-
-
-export function useCurrentQuestionAttempt() {
-    const qc = useQueryClient();
-
-    return useMutation({
-        mutationFn: (payload: any) =>
-            backend.post<MultipleChoiceResponse>({
-                root: 'questions',
-                route: '/attempt',
-                payload: {
-                    ...payload,
-                },
-            }),
-
-        onSuccess: (data) => {
-            // Update the cache for the "current question"
-            toast.success(`Scored ${data?.score || -1} on this question`)
-            qc.setQueryData<MultipleChoiceResponse>(
-                questionKeys.current(),
-                (old) => {
-                    if (!old) return old; // no cache yet
-                    return {
-                        ...data
-                    };
-                }
-            );
-        },
-    });
-}
 
 
 

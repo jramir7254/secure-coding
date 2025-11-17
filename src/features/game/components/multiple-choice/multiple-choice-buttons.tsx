@@ -6,6 +6,9 @@ import type { GetCurrentQuestionResponse, Question } from "../../types/questions
 import { type AnswerChoices, type GetQuestionResponse, useMultipleChoiceAttempt } from "../../hooks/use-question";
 import type { QuestionAttempt } from "../../types/questions";
 
+import CooldownButton from "@/components/blocks/cooldown-button";
+import { logger } from "@/lib/logger";
+
 const MotionButton = motion.create(Button);
 
 type ButtonProps = { value: AnswerChoices; label: string };
@@ -35,11 +38,16 @@ export function QuizButtons({ data }: { data: GetCurrentQuestionResponse }) {
         );
     };
 
+    logger.debug(`[selected.length]: ${selected.length}`)
+
     const handleSubmit = async () => {
         if (selected.length === 0) return; // nothing chosen
         try {
             await submitAttempt.mutateAsync(selected);
             console.log("✅ Correct!");
+            setSelected([]);
+
+
         } catch (error) {
             setIsIncorrect(true);
             setTimeout(() => {
@@ -78,9 +86,11 @@ export function QuizButtons({ data }: { data: GetCurrentQuestionResponse }) {
                 );
             })}
 
-            <Button className=" w-[75%] mt-5" onClick={handleSubmit}>
+
+
+            <CooldownButton disabled={selected.length === 0} className=" w-[75%] mt-5" action={handleSubmit} >
                 Submit
-            </Button>
+            </CooldownButton>
         </div>
     );
 }

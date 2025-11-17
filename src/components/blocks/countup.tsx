@@ -1,17 +1,21 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useCurrentQuestion } from "@/features/game/hooks/use-question";
+import { useCurrentQuestion, useCurrentAttempt } from "@/features/game/hooks/use-question";
 import { useEndGame } from "@/features/admin/hooks/use-admin";
 
 
 function CountUpTimer() {
     const [elapsed, setElapsed] = useState(0);
-    const { data } = useCurrentQuestion()
+    const attempt = useCurrentAttempt()
 
-    const startedAt = data?.attemptData.startedAt || 0
+    if (!attempt) return <p>loading</p>
+
+    const startedAt = attempt.startedAt || '0'
 
 
     useEffect(() => {
-        if (!data?.attemptData.startedAt || data.attemptData.completedAt) return;
+        if (!attempt?.startedAt || attempt.completedAt) {
+            return;
+        }
 
         // Convert backend UTC timestamp to milliseconds since epoch
         const startTime = new Date(startedAt.replace(" ", "T") + "Z").getTime();
@@ -35,7 +39,7 @@ function CountUpTimer() {
         return `${String(hrs).padStart(2, "0")}:${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
     };
 
-    return <div>⏱️ {formatTime(elapsed)}</div>;
+    return <div>Time on question: {formatTime(elapsed)}</div>;
 }
 
 export default CountUpTimer;

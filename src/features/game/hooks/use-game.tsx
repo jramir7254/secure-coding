@@ -74,12 +74,12 @@ export function useCurrentGameLeaderboard() {
     useEffect(() => {
         if (!socket) return;
 
-        socket.on('leaderboard_updated', (data: { teamId: string, score: number, teamName: string }) => {
+        socket.on('leaderboard_updated', (data: LeaderboardData) => {
             logger.info('[Socket]: "leaderboard_updated"', data)
             queryClient.setQueryData(gameKeys.current.leaderboard(), (old: LeaderboardData[]) => {
                 if (!old) return [{ ...data }]
-                if (!old.some(l => l.teamId === data.teamId)) return [...old, { ...data, totalPoints: data.score }]
-                return old.map(l => l.teamId === data.teamId ? { ...l, points: l.totalPoints = data.score } : l)
+                if (!old.some(l => l.teamId === data.teamId)) return [...old, { ...data, totalPoints: data.totalPoints }]
+                return old.map(l => l.teamId === data.teamId ? { ...l, points: l.totalPoints = data.totalPoints } : l)
             })
             queryClient.invalidateQueries({ queryKey: gameKeys.current.leaderboard(), refetchType: 'none' });
         });

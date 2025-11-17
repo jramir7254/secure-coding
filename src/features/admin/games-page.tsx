@@ -67,7 +67,7 @@ export default function GamesPage() {
 
                     {currentTeams && currentTeams.map(t =>
                         <TeamCard key={`${t.teamName}-${t.id}`} team={t} >
-                            <p>{t.accessCode}</p>
+                            <p>{t.joinCode}</p>
                             <DeleteTeamButton teamId={t.id} teamName={t.teamName} />
                         </TeamCard>
                     )}

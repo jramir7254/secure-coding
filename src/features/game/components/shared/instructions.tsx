@@ -8,21 +8,20 @@ import rehypeRaw from 'rehype-raw'
 
 
 export default function Instructions() {
-    const { data } = useCurrentQuestion()
+    const question = useCurrentQuestion()
 
-    if (!data) return
+    if (!question) return
 
-    const { questionData } = data
     return (
         <ScrollArea className='h-full'>
-            <h2 className='font-nunit text-2xl'>{questionData.title}</h2>
+            <h2 className='font-nunit text-2xl'>{question.title}</h2>
             <Separator />
             <article className="prose max-w-none dark:prose-invert">
                 <Markdown
                     remarkPlugins={[remarkGfm]}
                     rehypePlugins={[rehypeRaw]}
                 >
-                    {questionData.description}
+                    {question.description}
                 </Markdown>
             </article>
         </ScrollArea>

@@ -11,7 +11,7 @@ export default function FileTabs() {
     const { setCurrentFile, orderedFiles, currentFile } = useCodeEditor()
 
     return (
-        <Tabs defaultValue={typeof currentFile === 'string' ? currentFile : currentFile.name} orientation='vertical'>
+        <Tabs value={typeof currentFile === 'string' ? currentFile : currentFile.name} orientation='vertical'>
 
             <TabsList className="flex-col items-start p-0  rounded-none h-auto w-full bg-inherit overflow-hidden">
                 <TabsTrigger
