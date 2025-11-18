@@ -3,14 +3,14 @@
 export type AnswerChoices = 'runtime' | 'logic' | 'compile' | 'vulnerability' | null;
 export type QuestionTags = 'runtime' | 'logic' | 'compile' | 'vulnerability' | null;
 export type QuestionTypes = 'mcq' | 'break' | 'fix' | 'exploit' | 'coding' | null
-export type Difficulties = 'easy' | 'medium' | 'hard'
+export type Difficulties = 'easy' | 'medium' | 'hard' | null
 
 type RestrictedRanges = [number, number, number, number] | [number, number]
 
 
 export interface CodeFile {
-    id: string
-    questionId: string
+    id: number
+    questionId: number
     name: string,
     language: string,
     value: string,
@@ -24,7 +24,7 @@ export interface Question {
     title: string
     type: QuestionTypes
     difficulty: Difficulties
-    tags: QuestionTags[]
+    tags: QuestionTags[] | null
     description?: string
     explanation?: string
     codeFiles: CodeFile[]
@@ -33,8 +33,8 @@ export interface Question {
 
 export interface QuestionAttempt {
     id: number
-    questionId: string
-    teamId: string
+    questionId: number
+    teamId: number
     startedAt: string
     completedAt: string | null
     score: number

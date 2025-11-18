@@ -45,6 +45,26 @@ export function useCurrentQuestionAttempt() {
     return useQuery({
         queryKey: questionKeys.current(),
         queryFn: () => backend.get<GetCurrentQuestionResponse>({ root: 'questions', route: '/current' }),
+        placeholderData: () => ({
+            attemptData: {
+                id: -1,
+                questionId: -1,
+                teamId: -1,
+                startedAt: "",
+                completedAt: null,
+                score: -1
+            },
+            questionData: {
+                id: -1,
+                title: "",
+                type: null,
+                difficulty: null,
+                tags: null,
+                description: "",
+                explanation: "",
+                codeFiles: [],
+            }
+        }),
     })
 }
 
@@ -77,7 +97,41 @@ export function useIsAttemptComplete() {
 }
 
 
-export function useQuestionAttempt(payload: any) {
+export function useQuestionAttempt() {
+    const attemptData = useCurrentAttempt()
+    const questionData = useCurrentQuestion()
+    const qc = useQueryClient();
+
+    return useMutation({
+        mutationFn: (submissionData: any) =>
+            backend.post<MultipleChoiceResponse>({
+                root: 'questions',
+                route: '/attempt',
+                payload: {
+                    attemptData,
+                    questionData,
+                    submissionData,
+                },
+            }),
+
+        onSuccess: (data) => {
+            // Update the cache for the "current question"
+            toast.success(`Scored ${data.score} on this question`)
+            qc.setQueryData(
+                questionKeys.current(),
+                (old: GetCurrentQuestionResponse) => {
+                    if (!old) return old; // no cache yet
+                    return {
+                        ...old,
+                        attemptData: {
+                            ...old.attemptData,
+                            completedAt: new Date()
+                        }
+                    };
+                }
+            );
+        },
+    });
 }
 
 

@@ -1,25 +1,23 @@
 import { Button } from '@/components/ui/button'
 import React, { useState, type SetStateAction } from 'react'
 import { Play } from 'lucide-react';
-import { PistonApi } from '@/lib/api';
-import { useCodingAttempt, useCurrentQuestionAttempt } from '../../hooks/use-question';
+import { useCurrentQuestion, useQuestionAttempt } from '../../hooks/use-question';
 import { useCodeEditor } from '../../context/editor-context'
-import { useCurrentQuestion } from '../../hooks/use-question';
 import { logger } from '@/lib/logger';
 import { loader } from '@monaco-editor/react';
+import CooldownButton from '@/components/blocks/cooldown-button';
 
 export default function RunButton() {
-    const { orderedFiles, currentFile, question, pushToTerminal } = useCodeEditor()
-    const { data: qac } = useCurrentQuestion()
-    const submitAttempt = useCurrentQuestionAttempt()
+    const { pushToTerminal } = useCodeEditor()
+    const questionData = useCurrentQuestion()
+    const submitAttempt = useQuestionAttempt()
     const [loading, setIsLoading] = useState(false)
 
-    if (!qac) return
-
-    const { attemptData, questionData } = qac
 
 
-    const shouldHide = question?.type === 'mcq'
+    const shouldHide = questionData?.type === 'mcq'
+
+    logger.debug('Run button', { shouldHide, questionData, attemptData })
 
     // const submitAttempt = useCodingAttempt({ questionId: question.id, attemptId, questionType: 'coding' })
 
@@ -37,9 +35,8 @@ export default function RunButton() {
             }));
 
             logger.debug(allModelValues);
-            // logger.info("input")
-            const { output } = await submitAttempt.mutateAsync({ questionData, attemptData, submittedCode: allModelValues })
-            // console.log("d", output)
+            const { output } = await submitAttempt.mutateAsync(allModelValues)
+            logger.debug("[output]", output)
             pushToTerminal(output)
 
         } catch (error: any) {
@@ -54,6 +51,8 @@ export default function RunButton() {
     }
 
     return (
-        <Button onClick={run} hidden={shouldHide} disabled={loading}>Run<Play /></Button>
+        <CooldownButton duration={30} action={run} hidden={shouldHide} disabled={loading}>
+            Run <Play />
+        </CooldownButton>
     )
 }

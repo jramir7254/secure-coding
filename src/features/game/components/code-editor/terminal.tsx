@@ -32,7 +32,6 @@ export default function OutputTerminal() {
     )
 }
 
-
 const CommandLine = ({ teamName }: { teamName: string }) => (
 
     <p className='mt-5'>

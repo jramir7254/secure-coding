@@ -4,8 +4,19 @@ import { Spinner } from "../ui/spinner";
 import { type ShadCnButtonProps } from "../ui";
 import { logger } from "@/lib/logger";
 
-export default function CooldownButton({ action, disabled, children, ...props }: ShadCnButtonProps & { action: () => Promise<any> }) {
-    const COOLDOWN_SECONDS = 10;
+
+type CooldownButtonProps = ShadCnButtonProps & {
+    action: () => Promise<any>
+    duration?: number
+}
+
+export default function CooldownButton({
+    action,
+    duration = 10,
+    disabled,
+    children,
+    ...props
+}: CooldownButtonProps) {
 
     const [loading, setLoading] = useState(false);
     const [cooldown, setCooldown] = useState(0);
@@ -62,15 +73,15 @@ export default function CooldownButton({ action, disabled, children, ...props }:
         } finally {
             setLoading(false);
 
-            setCooldown(COOLDOWN_SECONDS);
+            setCooldown(duration);
             localStorage.setItem(
                 "cooldown",
-                String(Date.now() + COOLDOWN_SECONDS * 1000)
+                String(Date.now() + duration * 1000)
             );
         }
     };
 
-    logger.debug(`[disabled]: ${disabled}`)
+    // logger.debug(`[disabled]: ${disabled}`)
 
 
     return (
