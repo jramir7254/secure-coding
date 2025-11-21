@@ -1,6 +1,11 @@
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteBase /
+
+  # --- Allow Socket.IO requests to bypass index.html ---
+  RewriteCond %{REQUEST_URI} ^/socket\.io/ [NC]
+  RewriteRule .* - [L]
+
   RewriteRule ^index\.html$ - [L]
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
