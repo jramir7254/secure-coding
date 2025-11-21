@@ -31,7 +31,7 @@ export default function Editor() {
             logger.debug('Editable range:', rangeData);
             logger.debug('Editable range type:', typeof rangeData);
             logger.debug('Editable range isArray:', Array.isArray(rangeData));
-            logger.debug('Editable range length:', rangeData.length);
+            logger.debug('Editable range length:', rangeData?.length);
 
             // Example expected format: [startLine, startColumn, endLine, endColumn]
             if (Array.isArray(rangeData) && rangeData.length >= 1) {

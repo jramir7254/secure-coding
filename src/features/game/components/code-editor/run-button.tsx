@@ -17,7 +17,7 @@ export default function RunButton() {
 
     const shouldHide = questionData?.type === 'mcq'
 
-    logger.debug('Run button', { shouldHide, questionData, attemptData })
+    logger.debug('Run button', { shouldHide, questionData })
 
     // const submitAttempt = useCodingAttempt({ questionId: question.id, attemptId, questionType: 'coding' })
 

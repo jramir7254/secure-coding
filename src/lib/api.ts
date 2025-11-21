@@ -1,5 +1,7 @@
 import axios from 'axios';
 import { useTokenStore } from '@/features/auth/hooks/use-auth';
+const URL = import.meta.env.VITE_API_URL
+
 
 export const PistonApi = axios.create({
     baseURL: 'https://emkc.org/api/v2/piston'
@@ -7,12 +9,12 @@ export const PistonApi = axios.create({
 
 
 export const BackendApi = axios.create({
-    baseURL: 'http://localhost:3001'
+    baseURL: URL
 })
 
 
 export const PublicApi = axios.create({
-    baseURL: 'http://localhost:3001'
+    baseURL: URL
 })
 
 export interface ApiError {
